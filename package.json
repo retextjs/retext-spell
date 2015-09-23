@@ -1,0 +1,55 @@
+{
+  "name": "retext-spell",
+  "version": "0.0.0",
+  "description": "Spelling checker for retext",
+  "license": "MIT",
+  "keywords": [
+    "spelling",
+    "correct",
+    "checker",
+    "spell",
+    "fix",
+    "autocorrect",
+    "retext"
+  ],
+  "dependencies": {
+    "nlcst-is-literal": "^1.0.0",
+    "nlcst-to-string": "^1.0.0",
+    "nodehun": "^2.0.8",
+    "unist-util-visit": "^1.0.0"
+  },
+  "files": [
+    "index.js"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wooorm/retext-spell.git"
+  },
+  "author": "Titus Wormer <tituswormer@gmail.com>",
+  "devDependencies": {
+    "dictionary-en-gb": "^1.0.1",
+    "dictionary-en-us": "^1.0.1",
+    "eslint": "^1.0.0",
+    "istanbul": "^0.3.0",
+    "jscs": "^2.0.0",
+    "jscs-jsdoc": "^1.0.0",
+    "mdast": "^2.0.0",
+    "mdast-comment-config": "^1.0.0",
+    "mdast-github": "^1.0.0",
+    "mdast-lint": "^1.0.0",
+    "mdast-slug": "^2.0.0",
+    "mdast-validate-links": "^1.0.0",
+    "retext": "^1.0.0",
+    "tape": "^4.2.0",
+    "vfile-reporter": "^1.4.0"
+  },
+  "scripts": {
+    "build": "mdast . --quiet  --frail",
+    "lint-api": "eslint .",
+    "lint-style": "jscs --reporter inline .",
+    "lint": "npm run lint-api && npm run lint-style",
+    "test-api": "node test.js",
+    "test-coverage": "istanbul cover test.js",
+    "test": "npm run build && npm run lint && npm run test-coverage"
+  }
+}
