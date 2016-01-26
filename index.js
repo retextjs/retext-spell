@@ -54,7 +54,7 @@ function all(tree, file, config, next) {
             if (!err && correct.length) {
                 message = toString(node) + ' > ' + correct.join(', ');
                 message = file.warn(message, node);
-                message.ruleId = 'retext-spell';
+                message.source = 'retext-spell';
             }
 
             queue--;
