@@ -14,6 +14,7 @@
   ],
   "dependencies": {
     "hunspell-spellchecker": "^1.0.2",
+    "lodash": "^4.14.1",
     "nlcst-is-literal": "^1.0.0",
     "nlcst-to-string": "^1.0.0",
     "unist-util-visit": "^1.0.0"

@@ -63,6 +63,9 @@ file](https://github.com/wooorm/vfile)s.
 
     *   `dictionary` — See above;
 
+    *   `ignore` (`array?`, default `null`)
+        - An array of words to ignore.
+
     *   `ignoreLiteral` (`boolean?`, default `true`)
         — Whether to ignore [literal words](https://github.com/wooorm/nlcst-is-literal#isliteralparent-index).
 

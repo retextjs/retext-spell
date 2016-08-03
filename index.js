@@ -16,6 +16,7 @@ var Spellchecker = require('hunspell-spellchecker');
 var visit = require('unist-util-visit');
 var toString = require('nlcst-to-string');
 var isLiteral = require('nlcst-is-literal');
+var includes = require('lodash/includes');
 
 var spellchecker =  new Spellchecker();
 /**
@@ -28,8 +29,10 @@ var spellchecker =  new Spellchecker();
  * @param {Object} config - Configuration.
  */
 function all(tree, file, config) {
+    var ignore = config.ignore;
+    var ignoreLiteral = config.ignoreLiteral;
+
     spellchecker.use(config.dictionary);
-    var ignoreLiteral = config.ignore;
 
     /**
      * Check a single `WordNode`.
@@ -40,12 +43,15 @@ function all(tree, file, config) {
      * @param {NLCSTNode} parent - `parent` of `node`.
      */
     function one(node, index, parent) {
+        var isCorrect = true;
+        var word = toString(node);
+
+        if (includes(ignore, word)) return;
         if (ignoreLiteral && isLiteral(parent, index)) {
             return;
         }
 
-        var word = toString(node);
-        var isCorrect = spellchecker.check(word);
+        isCorrect = spellchecker.check(word);
 
         if (!isCorrect) {
             file.warn(word + ' is mispelled.', node, 'spelling');
@@ -69,7 +75,8 @@ function all(tree, file, config) {
 function attacher(retext, options) {
     var queue = [];
     var load = options && (options.dictionary || options);
-    var ignore = options && options.ignoreLiteral;
+    var ignore = options && options.ignore;
+    var ignoreLiteral = options && options.ignoreLiteral;
     var config = {};
     var loadError;
 
@@ -77,7 +84,11 @@ function attacher(retext, options) {
         throw new Error('Expected `Object`, got `' + load + '`');
     }
 
-    config.ignore = ignore === null || ignore === undefined ? true : ignore;
+    if (ignoreLiteral === null || ignoreLiteral === undefined) {
+        ignoreLiteral = true;
+    }
+    config.ignoreLiteral = ignoreLiteral;
+    config.ignore = ignore;
 
     /**
      * Callback invoked when a `dictionary` is constructed
