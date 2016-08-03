@@ -29,9 +29,9 @@ Yields:
 
 ```txt
 <stdin>
-   1:6-1:12  warning  useles > useless, uses                                   retext-spell
-  1:13-1:20  warning  mispelt > misspelt, mi spelt, mi-spelt, misspell, spelt  retext-spell
-  1:21-1:30  warning  documeant > document                                     retext-spell
+   1:6-1:12  warning  useles is misspelled.                                    spelling
+  1:13-1:20  warning  mispelt is misspelled.                                   spelling
+  1:21-1:30  warning  documeant is misspelled.                                 spelling
 
 ⚠ 3 warnings
 ```
