@@ -12,10 +12,13 @@
  * Dependencies.
  */
 
-var nodehun = require('nodehun').createNewNodehun;
+var Spellchecker = require('hunspell-spellchecker');
 var visit = require('unist-util-visit');
 var toString = require('nlcst-to-string');
 var isLiteral = require('nlcst-is-literal');
+var includes = require('lodash.includes');
+
+var spellchecker =  new Spellchecker();
 
 /**
  * Check a file for spelling mistakes.
@@ -25,13 +28,12 @@ var isLiteral = require('nlcst-is-literal');
  * @param {NLCSTNode} tree - Parent node of `WordNode`s.
  * @param {VFile} file - Virtual file.
  * @param {Object} config - Configuration.
- * @param {function(Error?)} next - Invoked to continue or
- *   break the middleware.
  */
-function all(tree, file, config, next) {
-    var hun = config.dictionary;
-    var ignoreLiteral = config.ignore;
-    var queue = 0;
+function all(tree, file, config) {
+    var ignore = config.ignore;
+    var ignoreLiteral = config.ignoreLiteral;
+
+    spellchecker.use(config.dictionary);
 
     /**
      * Check a single `WordNode`.
@@ -42,38 +44,29 @@ function all(tree, file, config, next) {
      * @param {NLCSTNode} parent - `parent` of `node`.
      */
     function one(node, index, parent) {
+        var isCorrect = true;
+        var word = toString(node);
+
+        if (includes(ignore, word)) {
+            return;
+        }
+
         if (ignoreLiteral && isLiteral(parent, index)) {
             return;
         }
 
-        queue++;
+        isCorrect = spellchecker.check(word);
 
-        hun.spellSuggestions(toString(node), function (err, _, correct) {
-            var message;
+        if (!isCorrect) {
+            file.warn(word + ' is misspelled', node, 'spelling');
+        }
 
-            if (!err && correct.length) {
-                message = toString(node) + ' > ' + correct.join(', ');
-                message = file.warn(message, node);
-                message.source = 'retext-spell';
-            }
-
-            queue--;
-
-            if (!queue) {
-                next();
-            }
-        });
     }
 
     /*
      * Visit all words.
      */
-
     visit(tree, 'WordNode', one);
-
-    if (!queue) {
-        next();
-    }
 }
 
 /**
@@ -86,7 +79,8 @@ function all(tree, file, config, next) {
 function attacher(retext, options) {
     var queue = [];
     var load = options && (options.dictionary || options);
-    var ignore = options && options.ignoreLiteral;
+    var ignore = options && options.ignore;
+    var ignoreLiteral = options && options.ignoreLiteral;
     var config = {};
     var loadError;
 
@@ -94,31 +88,36 @@ function attacher(retext, options) {
         throw new Error('Expected `Object`, got `' + load + '`');
     }
 
-    config.ignore = ignore === null || ignore === undefined ? true : ignore;
+    if (ignoreLiteral === null || ignoreLiteral === undefined) {
+        ignoreLiteral = true;
+    }
+
+    config.ignoreLiteral = ignoreLiteral;
+    config.ignore = ignore;
 
     /**
-     * Callback invoked when a `hun` is constructed
-     * (possibly erroneous) for the given dictionary or
-     * when `load`ing failed.
+     * Callback invoked when a `dictionary` is constructed
+     * (possibly erroneous) or when `load`ing failed.
      *
      * Flushes the queue when available, and sets the
      * results on the parent scope.
      *
      * @param {Error?} err - Construction or loading error.
-     * @param {Hun?} hun - Dictionary instance.
+     * @param {Dictionary?} dictionary - Dictionary instance.
      */
-    function construct(err, hun) {
+    function construct(err, dictionary) {
         var length = queue.length;
         var index = -1;
 
-        config.dictionary = hun;
+        config.dictionary = dictionary;
         loadError = err;
 
         while (++index < length) {
             if (loadError) {
-                queue[index][3](loadError);
+                queue[index][3](loadError); // next();
             } else {
                 all.apply(null, queue[index]);
+                queue[index][3](); // next();
             }
         }
 
@@ -135,7 +134,10 @@ function attacher(retext, options) {
         if (err) {
             construct(err);
         } else {
-            nodehun(result.aff, result.dic, construct);
+            construct(null, spellchecker.parse({
+                aff: result.aff,
+                dic: result.dic
+            }));
         }
     });
 
@@ -144,13 +146,14 @@ function attacher(retext, options) {
      * when everything has finished loading or queue’s
      * the arguments.
      */
-    return function (tree, file, next) {
+    return function transformer (tree, file, next) {
         if (!loadError && !config.dictionary) {
             queue.push([tree, file, config, next]);
         } else if (loadError) {
             next(loadError);
         } else {
-            all(tree, file, config, next);
+            all(tree, file, config);
+            next();
         }
     };
 }

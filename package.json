@@ -13,9 +13,10 @@
     "retext"
   ],
   "dependencies": {
+    "hunspell-spellchecker": "^1.0.2",
+    "lodash.includes": "^4.2.0",
     "nlcst-is-literal": "^1.0.0",
     "nlcst-to-string": "^1.0.0",
-    "nodehun": "^2.0.8",
     "unist-util-visit": "^1.0.0"
   },
   "files": [
