@@ -45,13 +45,18 @@ function all(tree, file, config) {
      */
     function one(node, index, parent) {
         var isCorrect = true;
-        var word = toString(node);
 
-        if (includes(ignore, word)) {
+        if (ignoreLiteral && isLiteral(parent, index)) {
             return;
         }
 
-        if (ignoreLiteral && isLiteral(parent, index)) {
+        if (node.children[node.children.length - 1].type == 'PunctuationNode') {
+            node.children.pop();
+        }
+
+        var word = toString(node);
+
+        if (includes(ignore, word)) {
             return;
         }
 
