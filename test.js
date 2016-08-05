@@ -132,6 +132,40 @@ test('...unless `ignoreLiteral` is false', function (t) {
     });
 });
 
+test('should ignore digits', function (t) {
+    t.plan(2);
+
+    retext().use(spell, enGB).process('123456', function (err, file) {
+        t.equal(err, null);
+        t.deepEqual(file.messages.map(String), []);
+    });
+});
+
+test('...unless `ignoreDigits` is false', function (t) {
+    t.plan(2);
+
+    retext().use(spell, {
+        'dictionary': enGB,
+        'ignoreDigits': false
+    }).process('123456', function (err, file) {
+        t.equal(err, null);
+        t.deepEqual(file.messages.map(String), [
+            '1:1-1:7: 123456 is misspelled'
+        ]);
+    });
+});
+
+test('should not ignore words that include digits', function (t) {
+    t.plan(2);
+
+    retext().use(spell, enGB).process('768x1024', function (err, file) {
+        t.equal(err, null);
+        t.deepEqual(file.messages.map(String), [
+            '1:1-1:9: 768x1024 is misspelled'
+        ]);
+    });
+});
+
 test('should `ignore`', function (t) {
     t.plan(2);
 

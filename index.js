@@ -32,6 +32,7 @@ var spellchecker =  new Spellchecker();
 function all(tree, file, config) {
     var ignore = config.ignore;
     var ignoreLiteral = config.ignoreLiteral;
+    var ignoreDigits = config.ignoreDigits;
 
     spellchecker.use(config.dictionary);
 
@@ -47,11 +48,11 @@ function all(tree, file, config) {
         var isCorrect = true;
         var word = toString(node);
 
-        if (includes(ignore, word)) {
+        if (ignoreLiteral && isLiteral(parent, index)) {
             return;
         }
 
-        if (ignoreLiteral && isLiteral(parent, index)) {
+        if (includes(ignore, word) || (ignoreDigits && /^\d+$/.test(word))) {
             return;
         }
 
@@ -81,6 +82,7 @@ function attacher(retext, options) {
     var load = options && (options.dictionary || options);
     var ignore = options && options.ignore;
     var ignoreLiteral = options && options.ignoreLiteral;
+    var ignoreDigits = options && options.ignoreDigits;
     var config = {};
     var loadError;
 
@@ -92,7 +94,12 @@ function attacher(retext, options) {
         ignoreLiteral = true;
     }
 
+    if (ignoreDigits === null || ignoreDigits === undefined) {
+        ignoreDigits = true;
+    }
+
     config.ignoreLiteral = ignoreLiteral;
+    config.ignoreDigits = ignoreDigits;
     config.ignore = ignore;
 
     /**
