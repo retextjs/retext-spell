@@ -132,6 +132,98 @@ test('...unless `ignoreLiteral` is false', function (t) {
     });
 });
 
+test('should warn for misspelled hyphenated words', function (t) {
+    t.plan(2);
+
+    retext().use(spell, {
+        'dictionary': enGB,
+        'ignoreDigits': false
+    }).process('wrongely-spelled-word', function (err, file) {
+        t.equal(err, null);
+        t.deepEqual(file.messages.map(String), [
+            '1:1-1:22: wrongely-spelled-word is misspelled'
+        ]);
+    });
+});
+
+test('should not warn for correctly spelled hyphenated words', function (t) {
+    t.plan(2);
+
+    retext().use(spell, enGB).process('random-hyphenated-word', function (err, file) {
+        t.equal(err, null);
+        t.deepEqual(file.messages.map(String), []);
+    });
+});
+
+test('should not warn for ignored words in hyphenated words', function (t) {
+    t.plan(2);
+
+    retext().use(spell, {
+        'dictionary': enGB,
+        'ignore': ['wrongely']
+    }).process('wrongely-spelled-word', function (err, file) {
+        t.equal(err, null);
+        t.deepEqual(file.messages.map(String), []);
+    });
+});
+
+test('should ignore digits', function (t) {
+    t.plan(2);
+
+    retext().use(spell, enGB).process('123456', function (err, file) {
+        t.equal(err, null);
+        t.deepEqual(file.messages.map(String), []);
+    });
+});
+
+test('...unless `ignoreDigits` is false', function (t) {
+    t.plan(2);
+
+    retext().use(spell, {
+        'dictionary': enGB,
+        'ignoreDigits': false
+    }).process('123456', function (err, file) {
+        t.equal(err, null);
+        t.deepEqual(file.messages.map(String), [
+            '1:1-1:7: 123456 is misspelled'
+        ]);
+    });
+});
+
+test('should ignore digits with decimals', function (t) {
+    t.plan(2);
+
+    retext().use(spell, enGB).process('3.14', function (err, file) {
+        t.equal(err, null);
+        t.deepEqual(file.messages.map(String), []);
+    });
+});
+
+test('...unless `ignoreDigits` is false', function (t) {
+    t.plan(2);
+
+    retext().use(spell, {
+        'dictionary': enGB,
+        'ignoreDigits': false
+    }).process('3.15', function (err, file) {
+        t.equal(err, null);
+        t.deepEqual(file.messages.map(String), [
+            '1:1-1:5: 3.15 is misspelled'
+        ]);
+    });
+});
+
+test('should not ignore words that include digits', function (t) {
+    t.plan(2);
+
+    retext().use(spell, enGB).process('768x1024', function (err, file) {
+        t.equal(err, null);
+        t.deepEqual(file.messages.map(String), [
+            '1:1-1:9: 768x1024 is misspelled'
+        ]);
+    });
+});
+
 test('should `ignore`', function (t) {
     t.plan(2);
 
