@@ -34,6 +34,15 @@ function all(tree, file, config) {
     var ignoreLiteral = config.ignoreLiteral;
     var ignoreDigits = config.ignoreDigits;
 
+    /**
+     * Check if a word should be excluded from spelling check
+     *
+     * @param {string} word - Word to check
+     */
+    function isIgnored(word) {
+        return includes(ignore, word) || (ignoreDigits && /^\d+$/.test(word));
+    }
+
     spellchecker.use(config.dictionary);
 
     /**
@@ -44,7 +53,7 @@ function all(tree, file, config) {
      *   `parent`.
      * @param {NLCSTNode} parent - `parent` of `node`.
      */
-    function one(node, index, parent) {
+    function checkWord(node, index, parent) {
         var isCorrect = true;
         var word = toString(node);
 
@@ -52,11 +61,24 @@ function all(tree, file, config) {
             return;
         }
 
-        if (includes(ignore, word) || (ignoreDigits && /^\d+$/.test(word))) {
+        if (isIgnored(word)) {
             return;
         }
 
         isCorrect = spellchecker.check(word);
+
+        if (!isCorrect && node.children && (node.children.length > 1)) {
+            isCorrect = true;
+            node.children.forEach(function (subnode) {
+                if (subnode.type != 'TextNode' || isIgnored(subnode.value)) {
+                    return;
+                }
+                var isPartCorrect = spellchecker.check(subnode.value);
+                if (!isPartCorrect) {
+                    isCorrect = false;
+                }
+            });
+        }
 
         if (!isCorrect) {
             file.warn(word + ' is misspelled', node, 'spelling');
@@ -67,7 +89,7 @@ function all(tree, file, config) {
     /*
      * Visit all words.
      */
-    visit(tree, 'WordNode', one);
+    visit(tree, 'WordNode', checkWord);
 }
 
 /**
