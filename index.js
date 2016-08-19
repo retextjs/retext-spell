@@ -48,7 +48,7 @@ function all(tree, file, config) {
 
     function isMention(node, parent) {
         var previousNode = parent.children[parent.children.indexOf(node) - 1];
-        return previousNode && toString(previousNode) == "@";
+        return previousNode && toString(previousNode) == '@';
     }
 
     /**
