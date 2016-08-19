@@ -33,6 +33,7 @@ function all(tree, file, config) {
     var ignore = config.ignore;
     var ignoreLiteral = config.ignoreLiteral;
     var ignoreDigits = config.ignoreDigits;
+    var ignoreMentions = config.ignoreMentions;
 
     spellchecker.use(config.dictionary);
 
@@ -43,6 +44,11 @@ function all(tree, file, config) {
      */
     function isIgnored(word) {
         return includes(ignore, word) || (ignoreDigits && /^\d+$/.test(word));
+    }
+
+    function isMention(node, parent) {
+        var previousNode = parent.children[parent.children.indexOf(node) - 1];
+        return previousNode && toString(previousNode) == "@";
     }
 
     /**
@@ -60,6 +66,10 @@ function all(tree, file, config) {
         var length;
         var index;
         var child;
+
+        if(ignoreMentions && isMention(node, parent)) {
+            return;
+        }
 
         if (ignoreLiteral && isLiteral(parent, position)) {
             return;
@@ -114,6 +124,7 @@ function attacher(retext, options) {
     var ignore = options && options.ignore;
     var ignoreLiteral = options && options.ignoreLiteral;
     var ignoreDigits = options && options.ignoreDigits;
+    var ignoreMentions = options && options.ignoreMentions;
     var config = {};
     var loadError;
 
@@ -129,8 +140,13 @@ function attacher(retext, options) {
         ignoreDigits = true;
     }
 
+    if (ignoreMentions === null || ignoreMentions === undefined) {
+        ignoreMentions = true;
+    }
+
     config.ignoreLiteral = ignoreLiteral;
     config.ignoreDigits = ignoreDigits;
+    config.ignoreMentions = ignoreMentions;
     config.ignore = ignore;
 
     /**
