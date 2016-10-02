@@ -12,45 +12,59 @@
     "autocorrect",
     "retext"
   ],
-  "dependencies": {
-    "hunspell-spellchecker": "^1.0.2",
-    "lodash.includes": "^4.2.0",
-    "nlcst-is-literal": "^1.0.0",
-    "nlcst-to-string": "^1.0.0",
-    "unist-util-visit": "^1.0.0"
+  "repository": "https://github.com/wooorm/retext-spell",
+  "bugs": "https://github.com/wooorm/retext-spell/issues",
+  "author": "Titus Wormer <tituswormer@gmail.com> (http://wooorm.com)",
+  "contributors": [
+    "Titus Wormer <tituswormer@gmail.com> (http://wooorm.com)",
+    "Josiah Sprague <josiah.sprague@gmail.com>",
+    "Jan Wirth <jottenwe@gmail.com>"
+  ],
+  "engines": {
+    "node": ">=0.12.0"
   },
   "files": [
     "index.js"
   ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/wooorm/retext-spell.git"
+  "dependencies": {
+    "hunspell-spellchecker": "^1.0.2",
+    "lodash.includes": "^4.2.0",
+    "nlcst-is-literal": "^1.0.0",
+    "nlcst-to-string": "^2.0.0",
+    "unist-util-visit": "^1.0.0"
   },
-  "author": "Titus Wormer <tituswormer@gmail.com>",
   "devDependencies": {
     "dictionary-en-gb": "^1.0.1",
     "dictionary-en-us": "^1.0.1",
-    "eslint": "^1.0.0",
-    "istanbul": "^0.3.0",
-    "jscs": "^2.0.0",
-    "jscs-jsdoc": "^1.0.0",
-    "mdast": "^2.0.0",
-    "mdast-comment-config": "^1.0.0",
-    "mdast-github": "^1.0.0",
-    "mdast-lint": "^1.0.0",
-    "mdast-slug": "^2.0.0",
-    "mdast-validate-links": "^1.0.0",
-    "retext": "^1.0.0",
+    "nyc": "^8.3.0",
+    "remark-cli": "^2.0.0",
+    "remark-preset-wooorm": "^1.0.0",
+    "retext": "^4.0.0",
     "tape": "^4.2.0",
-    "vfile-reporter": "^1.4.0"
+    "xo": "^0.16.0"
   },
   "scripts": {
-    "build": "mdast . --quiet  --frail",
-    "lint-api": "eslint .",
-    "lint-style": "jscs --reporter inline .",
-    "lint": "npm run lint-api && npm run lint-style",
+    "build-md": "remark . --quiet --frail",
+    "build": "npm run build-md",
+    "lint": "xo",
     "test-api": "node test.js",
-    "test-coverage": "istanbul cover test.js",
+    "test-coverage": "nyc --reporter lcov tape test.js",
     "test": "npm run build && npm run lint && npm run test-coverage"
+  },
+  "nyc": {
+    "check-coverage": true,
+    "lines": 100,
+    "functions": 100,
+    "branches": 100
+  },
+  "xo": {
+    "space": true,
+    "ignores": [
+      "retext-spell.js"
+    ]
+  },
+  "remarkConfig": {
+    "output": true,
+    "presets": "wooorm"
   }
 }

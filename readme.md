@@ -69,7 +69,7 @@ file](https://github.com/wooorm/vfile)s.
         — Whether to ignore [literal words](https://github.com/wooorm/nlcst-is-literal#isliteralparent-index).
 
     *   `ignoreDigits` (`boolean?`, default `true`)
-        — Whether to ignore "words" that contain only digits, i.e. `123456`.
+        — Whether to ignore “words” that contain only digits, i.e. `123456`.
 
 ## License
 
