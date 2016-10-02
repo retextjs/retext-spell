@@ -1,10 +1,10 @@
-# retext-spell [![Build Status](https://img.shields.io/travis/wooorm/retext-spell.svg)](https://travis-ci.org/wooorm/retext-spell) [![Coverage Status](https://img.shields.io/codecov/c/github/wooorm/retext-spell.svg)](https://codecov.io/github/wooorm/retext-spell)
+# retext-spell [![Build Status][travis-badge]][travis] [![Coverage Status][codecov-badge]][codecov]
 
-Spelling checker for [retext](https://github.com/wooorm/retext).
+Check spelling with [**retext**][retext].
 
 ## Installation
 
-[npm](https://docs.npmjs.com/cli/install):
+[npm][]:
 
 ```bash
 npm install retext-spell
@@ -17,60 +17,74 @@ var retext = require('retext');
 var spell = require('retext-spell');
 var dictionary = require('dictionary-en-gb');
 var report = require('vfile-reporter');
-var doc = 'Some useles mispelt documeant.';
 
-retext().use(spell, dictionary).process(doc, function (err, file) {
-    if (err) throw err;
-    console.log(report(file));
-});
+retext()
+  .use(spell, dictionary)
+  .process('Some useles mispelt documeant.', function (err, file) {
+    console.error(report(err || file));
+  });
 ```
 
 Yields:
 
 ```txt
-<stdin>
-   1:6-1:12  warning  useles is misspelled                                    spelling
-  1:13-1:20  warning  mispelt is misspelled                                   spelling
-  1:21-1:30  warning  documeant is misspelled                                 spelling
+   1:6-1:12  warning  useles is misspelled     spelling
+  1:13-1:20  warning  mispelt is misspelled    spelling
+  1:21-1:30  warning  documeant is misspelled  spelling
 
 ⚠ 3 warnings
 ```
 
 ## API
 
-### [retext](https://github.com/wooorm/retext#api).[use](https://github.com/wooorm/retext#retextuseplugin-options)(spell, options)
+### `retext().use(spell, dictionary|options)`
 
-> **retext-spell** is async; use the async form of
-> [`retext.process`](https://github.com/wooorm/retext#retextprocessvalue-done).
+> **retext-spell** is async; use the async form of [`process`][process].
 
 Adds warnings for misspelt words to processed [virtual
-file](https://github.com/wooorm/vfile)s.
+file][vfile]s.
 
-**Signatures**
+###### Parameters
 
-*   `use(plugin, dictionary)`;
-*   `use(plugin, options)`.
-
-**Parameters**
-
-*   `spell` — This plug-in.
-
-*   `dictionary` ([`Function`](https://github.com/wooorm/dictionaries))
-    — The result of requiring one of the dictionaries in
-    [`wooorm/dictionaries`](https://github.com/wooorm/dictionaries);
-
+*   `dictionary` ([`Function`][dictionaries])
+    — Result of requiring one of the dictionaries in
+    [`wooorm/dictionaries`][dictionaries];
 *   `options` (`Object`):
-
     *   `dictionary` — See above;
-
-    *   `ignore` (`array?`, default `null`) — List of words to ignore.
-
+    *   `ignore` (`Array.<string>`, default `[]`)
+        — List of words to ignore;
     *   `ignoreLiteral` (`boolean?`, default `true`)
-        — Whether to ignore [literal words](https://github.com/wooorm/nlcst-is-literal#isliteralparent-index).
-
+        — Whether to ignore [literal words][literal];
     *   `ignoreDigits` (`boolean?`, default `true`)
-        — Whether to ignore “words” that contain only digits, i.e. `123456`.
+        — Whether to ignore “words” that contain only
+        digits, such as `123456`.
 
 ## License
 
-[MIT](LICENSE) © [Titus Wormer](http://wooorm.com)
+[MIT][license] © [Titus Wormer][author]
+
+<!-- Definitions -->
+
+[travis-badge]: https://img.shields.io/travis/wooorm/retext-spell.svg
+
+[travis]: https://travis-ci.org/wooorm/retext-spell
+
+[codecov-badge]: https://img.shields.io/codecov/c/github/wooorm/retext-spell.svg
+
+[codecov]: https://codecov.io/github/wooorm/retext-spell
+
+[npm]: https://docs.npmjs.com/cli/install
+
+[license]: LICENSE
+
+[author]: http://wooorm.com
+
+[retext]: https://github.com/wooorm/retext
+
+[process]: https://github.com/wooorm/unified#processorprocessfilevalue-options-done
+
+[vfile]: https://github.com/wooorm/vfile
+
+[dictionaries]: https://github.com/wooorm/dictionaries
+
+[literal]: https://github.com/wooorm/nlcst-is-literal#isliteralparent-index
