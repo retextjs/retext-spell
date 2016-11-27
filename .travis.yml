@@ -1,8 +1,7 @@
 language: node_js
 node_js:
-- '0.12'
-- '5.0'
-- '6.0'
+- '4.0'
+- '7.0'
 after_script: bash <(curl -s https://codecov.io/bash)
 deploy:
   - provider: npm
@@ -11,4 +10,4 @@ deploy:
       secure: eksthJiH4vwU9FrPixQQqYOTiErL1M2rdTi6WZKvaJHzqmJAofbtzZ35GHkVmurEplQlJv6kFh1/7+R6/dIuOlcCA9OURl+3Ipj/ZtvR35w3UZIZRFaxpFWew1xspj/sQm3dL5EcdQxp91tZt5639Ce+EZJD8MAJG//xUQF8ZNvr445EYj/+e59bowP8l9XNE0GvN/1VfVzYm8siX2h9ARunwCqHkKyMYJla8ppo8jqwe7iC//GZNUyxMqs1js66EMqXZhuJNUtK3eZ/X6ygBnKh9KJvf77eGoEulDngh9Fg4h7vz4lGMde+Xx2c3zH5wFOafYnbn10Fg0ceBuZsKGiZa+E4dorN/jGTVY0N7NCLXB6Oh/RZ7fG6xNe+Pzij0b8g/AwpkedKbJXHwwHLHYhIG5ivSE8cev3optuN0TbrcfpLAWGmE93VOXUUjvIoGRikeu/fbGR9iDmjh9Mo2vrBB7v5edFKVuRxRe7P/FD18MrDlW+nRNMpV6mOeV1+CaXxKOLlOmrFNstz7XTL869yjOfoBjUw8jh6aLfXMGtXZFs80jQBd6GZBjugM4HMWIhp8juER5PLlysEx25QB3TIBHVDJz6Fw9roWATiotfCEkIjIDx4acG6rZXotKXwftmRvw2jsx0EORsYEuHZL3JhcXN5Oy7Obyw+grvZLNI=
     on:
       tags: true
-      node: '5.0'
+      node: '4.0'
