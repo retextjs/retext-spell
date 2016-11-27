@@ -36,18 +36,18 @@
   "devDependencies": {
     "dictionary-en-gb": "^1.0.1",
     "dictionary-en-us": "^1.0.1",
-    "nyc": "^8.3.0",
+    "nyc": "^10.0.0",
     "remark-cli": "^2.0.0",
     "remark-preset-wooorm": "^1.0.0",
     "retext": "^4.0.0",
     "tape": "^4.2.0",
-    "xo": "^0.16.0"
+    "xo": "^0.17.1"
   },
   "scripts": {
-    "build-md": "remark . --quiet --frail",
+    "build-md": "remark . -qfo",
     "build": "npm run build-md",
     "lint": "xo",
-    "test-api": "node test.js",
+    "test-api": "node test",
     "test-coverage": "nyc --reporter lcov tape test.js",
     "test": "npm run build && npm run lint && npm run test-coverage"
   },
@@ -64,7 +64,6 @@
     ]
   },
   "remarkConfig": {
-    "output": true,
     "presets": "wooorm"
   }
 }
