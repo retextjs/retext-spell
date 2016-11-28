@@ -1,14 +1,5 @@
-/**
- * @author Titus Wormer
- * @copyright 2015 Titus Wormer
- * @license MIT
- * @module retext:spell
- * @fileoverview Spell checker for retext.
- */
-
 'use strict';
 
-/* Dependencies. */
 var nspell = require('nspell');
 var has = require('has');
 var visit = require('unist-util-visit');
@@ -17,13 +8,11 @@ var isLiteral = require('nlcst-is-literal');
 var includes = require('lodash.includes');
 var quote = require('quotation');
 
-/* Expose. */
 module.exports = spell;
 
 var source = 'retext-spell';
 var max = 30;
 
-/* Plugin attacher. */
 function spell(retext, options) {
   var queue = [];
   var settings = options || {};

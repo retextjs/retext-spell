@@ -1,21 +1,11 @@
-/**
- * @author Titus Wormer
- * @copyright 2015 Titus Wormer
- * @license MIT
- * @module retext:spell
- * @fileoverview Test suite for `retext-spell`.
- */
-
 'use strict';
 
-/* Dependencies. */
 var test = require('tape');
 var enUS = require('dictionary-en-us');
 var enGB = require('dictionary-en-gb');
 var retext = require('retext');
 var spell = require('./');
 
-/* Tests. */
 test('should throw when without `options`', function (t) {
   t.plan(1);
 
