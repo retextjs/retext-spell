@@ -20,17 +20,16 @@
     "Josiah Sprague <josiah.sprague@gmail.com>",
     "Jan Wirth <jottenwe@gmail.com>"
   ],
-  "engines": {
-    "node": ">=0.12.0"
-  },
   "files": [
     "index.js"
   ],
   "dependencies": {
-    "hunspell-spellchecker": "^1.0.2",
+    "has": "^1.0.1",
     "lodash.includes": "^4.2.0",
     "nlcst-is-literal": "^1.0.0",
     "nlcst-to-string": "^2.0.0",
+    "nspell": "^0.0.0",
+    "quotation": "^1.1.0",
     "unist-util-visit": "^1.0.0"
   },
   "devDependencies": {
@@ -41,6 +40,7 @@
     "remark-preset-wooorm": "^1.0.0",
     "retext": "^4.0.0",
     "tape": "^4.2.0",
+    "vfile-reporter": "^3.0.0",
     "xo": "^0.17.1"
   },
   "scripts": {

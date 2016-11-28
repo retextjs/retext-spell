@@ -28,9 +28,9 @@ retext()
 Yields:
 
 ```txt
-   1:6-1:12  warning  useles is misspelled     spelling
-  1:13-1:20  warning  mispelt is misspelled    spelling
-  1:21-1:30  warning  documeant is misspelled  spelling
+   1:6-1:12  warning  `useles` is misspelt     retext-spell  retext-spell
+  1:13-1:20  warning  `mispelt` is misspelt    retext-spell  retext-spell
+  1:21-1:30  warning  `documeant` is misspelt  retext-spell  retext-spell
 
 ⚠ 3 warnings
 ```
@@ -57,7 +57,11 @@ file][vfile]s.
         — Whether to ignore [literal words][literal];
     *   `ignoreDigits` (`boolean?`, default `true`)
         — Whether to ignore “words” that contain only
-        digits, such as `123456`.
+        digits, such as `123456`;
+    *   `max` (`number?`, default `30`)
+        — Number of unique words to suggest for.  By default, up to thirty
+        words are suggested for.  Further misspellings are still warned about,
+        but without suggestions.
 
 ## License
 

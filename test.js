@@ -54,13 +54,13 @@ test('should fail load errors on the VFile', function (t) {
 });
 
 test('should warn for misspelt words', function (t) {
-  t.plan(4);
+  t.plan(6);
 
   retext().use(spell, enGB).process('color', function (err, file) {
     t.ifErr(err);
 
     t.deepEqual(file.messages.map(String), [
-      '1:1-1:6: color is misspelled'
+      '1:1-1:6: `color` is misspelt; did you mean `colon`, `colour`?'
     ]);
   });
 
@@ -68,9 +68,22 @@ test('should warn for misspelt words', function (t) {
     t.ifErr(err);
 
     t.deepEqual(file.messages.map(String), [
-      '1:1-1:7: colour is misspelled',
-      '1:12-1:19: utilise is misspelled'
+      '1:1-1:7: `colour` is misspelt; did you mean `color`?',
+      '1:12-1:19: `utilise` is misspelt; did you mean `utilize`?'
     ]);
+  });
+
+  retext().use(spell, enUS).process('colour and colour and colour', function (err, file) {
+    t.ifErr(err);
+
+    t.deepEqual(
+      file.messages.map(String),
+      [
+        '1:1-1:7: `colour` is misspelt; did you mean `color`?',
+        '1:12-1:18: `colour` is misspelt; did you mean `color`?',
+        '1:23-1:29: `colour` is misspelt; did you mean `color`?'
+      ]
+    );
   });
 });
 
@@ -83,7 +96,7 @@ test('should warn for invalid words (coverage)', function (t) {
     t.ifErr(err);
 
     t.deepEqual(file.messages.map(String), [
-      '1:1-1:6: color is misspelled'
+      '1:1-1:6: `color` is misspelt; did you mean `colon`, `colour`?'
     ]);
 
     /* Coverage: future files can start faster. */
@@ -92,6 +105,26 @@ test('should warn for invalid words (coverage)', function (t) {
       t.deepEqual(file.messages.map(String), []);
     });
   });
+});
+
+test('should support `max`, for maximum suggestions', function (t) {
+  t.plan(2);
+
+  retext()
+    .use(spell, {dictionary: enGB, max: 1})
+    .process('Some useles mispelt documeant', function (err, file) {
+      t.ifErr(err);
+
+      t.deepEqual(
+        file.messages.map(String),
+        [
+          '1:6-1:12: `useles` is misspelt',
+          '1:13-1:20: Too many misspellings; no further spell suggestions are given',
+          '1:13-1:20: `mispelt` is misspelt',
+          '1:21-1:30: `documeant` is misspelt'
+        ]
+      );
+    });
 });
 
 test('should ignore literal words', function (t) {
@@ -111,11 +144,14 @@ test('...unless `ignoreLiteral` is false', function (t) {
     ignoreLiteral: false
   }).process('“color”', function (err, file) {
     t.ifErr(err);
-    t.deepEqual(file.messages.map(String), ['1:2-1:7: color is misspelled']);
+    t.deepEqual(
+      file.messages.map(String),
+      ['1:2-1:7: `color` is misspelt; did you mean `colon`, `colour`?']
+    );
   });
 });
 
-test('should warn for misspelled hyphenated words', function (t) {
+test('should warn for misspelt hyphenated words', function (t) {
   t.plan(2);
 
   retext().use(spell, {
@@ -124,7 +160,7 @@ test('should warn for misspelled hyphenated words', function (t) {
   }).process('wrongely-spelled-word', function (err, file) {
     t.ifErr(err);
     t.deepEqual(file.messages.map(String), [
-      '1:1-1:22: wrongely-spelled-word is misspelled'
+      '1:1-1:22: `wrongely-spelled-word` is misspelt'
     ]);
   });
 });
@@ -168,7 +204,7 @@ test('...unless `ignoreDigits` is false', function (t) {
   }).process('123456', function (err, file) {
     t.ifErr(err);
     t.deepEqual(file.messages.map(String), [
-      '1:1-1:7: 123456 is misspelled'
+      '1:1-1:7: `123456` is misspelt'
     ]);
   });
 });
@@ -191,7 +227,7 @@ test('...unless `ignoreDigits` is false', function (t) {
   }).process('3.15', function (err, file) {
     t.ifErr(err);
     t.deepEqual(file.messages.map(String), [
-      '1:1-1:5: 3.15 is misspelled'
+      '1:1-1:5: `3.15` is misspelt'
     ]);
   });
 });
@@ -202,7 +238,7 @@ test('should not ignore words that include digits', function (t) {
   retext().use(spell, enGB).process('768x1024', function (err, file) {
     t.ifErr(err);
     t.deepEqual(file.messages.map(String), [
-      '1:1-1:9: 768x1024 is misspelled'
+      '1:1-1:9: `768x1024` is misspelt'
     ]);
   });
 });
@@ -216,7 +252,7 @@ test('should `ignore`', function (t) {
   }).process('color coloor', function (err, file) {
     t.ifErr(err);
     t.deepEqual(file.messages.map(String), [
-      '1:7-1:13: coloor is misspelled'
+      '1:7-1:13: `coloor` is misspelt; did you mean `colour`?'
     ]);
   });
 });

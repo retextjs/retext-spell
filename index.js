@@ -9,100 +9,93 @@
 'use strict';
 
 /* Dependencies. */
-var Spellchecker = require('hunspell-spellchecker');
+var nspell = require('nspell');
+var has = require('has');
 var visit = require('unist-util-visit');
 var toString = require('nlcst-to-string');
 var isLiteral = require('nlcst-is-literal');
 var includes = require('lodash.includes');
+var quote = require('quotation');
 
 /* Expose. */
 module.exports = spell;
 
-/* Constants. */
-var spellchecker = new Spellchecker();
+var source = 'retext-spell';
+var max = 30;
 
 /* Plugin attacher. */
 function spell(retext, options) {
   var queue = [];
+  var settings = options || {};
   var load = options && (options.dictionary || options);
-  var ignore = options && options.ignore;
-  var ignoreLiteral = options && options.ignoreLiteral;
-  var ignoreDigits = options && options.ignoreDigits;
+  var ignore = settings.ignore;
+  var literal = settings.ignoreLiteral;
+  var digits = settings.ignoreDigits;
   var config = {};
   var loadError;
 
-  if (!load) {
+  if (typeof load !== 'function') {
     throw new Error('Expected `Object`, got `' + load + '`');
   }
 
-  if (ignoreLiteral === null || ignoreLiteral === undefined) {
-    ignoreLiteral = true;
-  }
-
-  if (ignoreDigits === null || ignoreDigits === undefined) {
-    ignoreDigits = true;
-  }
-
-  config.ignoreLiteral = ignoreLiteral;
-  config.ignoreDigits = ignoreDigits;
+  config.ignoreLiteral = literal === null || literal === undefined ? true : literal;
+  config.ignoreDigits = digits === null || digits === undefined ? true : digits;
   config.ignore = ignore;
+  config.max = settings.max || max;
+  config.count = 0;
+  config.cache = {};
 
-  /* `load`. See `dictionaries` for signatures.
-   * Invokes `construct` on completion. */
-  load(function (err, result) {
-    construct(err, err ? null : spellchecker.parse(result));
-  });
+  load(construct);
 
   return transformer;
 
   /* Transformer which either immediatly invokes `all`
-   * when everything has finished loading or queue’s
+   * when everything has finished loading or queues
    * the arguments. */
   function transformer(tree, file, next) {
-    if (!loadError && !config.dictionary) {
-      queue.push([tree, file, config, next]);
-    } else if (loadError) {
+    if (loadError) {
       next(loadError);
-    } else {
+    } else if (config.checker) {
       all(tree, file, config);
       next();
+    } else {
+      queue.push([tree, file, config, next]);
     }
   }
 
-  /* Callback invoked when a `dictionary` is constructed
+  /* Callback invoked when a `dictionary` is loaded
    * (possibly erroneous) or when `load`ing failed.
-   *
    * Flushes the queue when available, and sets the
    * results on the parent scope. */
   function construct(err, dictionary) {
     var length = queue.length;
     var index = -1;
 
-    config.dictionary = dictionary;
     loadError = err;
 
+    if (dictionary) {
+      config.checker = nspell(dictionary);
+    }
+
     while (++index < length) {
-      if (loadError) {
-        queue[index][3](loadError);
-      } else {
+      if (!err) {
         all.apply(null, queue[index]);
-        queue[index][3]();
       }
+
+      queue[index][3](err);
     }
 
     queue = [];
   }
 }
 
-/* Check a file for spelling mistakes.
- * Can be invoked with `loadError` to fail on the file and
- * stop the middleware. */
+/* Check a file for spelling mistakes. */
 function all(tree, file, config) {
   var ignore = config.ignore;
   var ignoreLiteral = config.ignoreLiteral;
   var ignoreDigits = config.ignoreDigits;
-
-  spellchecker.use(config.dictionary);
+  var checker = config.checker;
+  var cache = config.cache;
 
   visit(tree, 'WordNode', checkWord);
 
@@ -116,6 +109,9 @@ function all(tree, file, config) {
     var length;
     var index;
     var child;
+    var reason;
+    var message;
+    var suggestions;
 
     if (ignoreLiteral && isLiteral(parent, position)) {
       return;
@@ -125,7 +121,7 @@ function all(tree, file, config) {
       return;
     }
 
-    correct = spellchecker.check(word);
+    correct = checker.correct(word);
 
     if (!correct && children.length > 1) {
       correct = true;
@@ -139,14 +135,44 @@ function all(tree, file, config) {
           continue;
         }
 
-        if (!spellchecker.check(child.value)) {
+        if (!checker.correct(child.value)) {
           correct = false;
         }
       }
     }
 
     if (!correct) {
-      file.warn(word + ' is misspelled', node, 'spelling');
+      if (has(cache, word)) {
+        reason = cache[word];
+      } else {
+        reason = quote(word, '`') + ' is misspelt';
+
+        if (config.count === config.max) {
+          message = file.message(
+            'Too many misspellings; no further spell suggestions are given',
+            node,
+            'overflow'
+          );
+
+          message.source = source;
+        }
+
+        config.count++;
+
+        if (config.count < config.max) {
+          suggestions = checker.suggest(word);
+
+          if (suggestions.length !== 0) {
+            reason += '; did you mean ' + quote(suggestions, '`').join(', ') + '?';
+            cache[word] = reason;
+          }
+        }
+
+        cache[word] = reason;
+      }
+
+      message = file.message(reason, node, source);
+      message.source = source;
     }
   }
 
