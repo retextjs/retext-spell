@@ -11,6 +11,7 @@ var quote = require('quotation');
 module.exports = spell;
 
 var source = 'retext-spell';
+var digitsOnly = /^\d+$/;
 var max = 30;
 
 function spell(retext, options) {
@@ -93,8 +94,8 @@ function all(tree, file, config) {
   /* Check one word. */
   function checkWord(node, position, parent) {
     var children = node.children;
-    var correct = true;
     var word = toString(node);
+    var correct;
     var length;
     var index;
     var child;
@@ -167,6 +168,6 @@ function all(tree, file, config) {
 
   /* Check if a word is irrelevant. */
   function irrelevant(word) {
-    return includes(ignore, word) || (ignoreDigits && /^\d+$/.test(word));
+    return includes(ignore, word) || (ignoreDigits && digitsOnly.test(word));
   }
 }
