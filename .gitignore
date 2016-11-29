@@ -3,3 +3,5 @@
 .nyc_output/
 coverage/
 node_modules/
+retext-spell.js
+retext-spell.min.js

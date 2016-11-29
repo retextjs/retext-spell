@@ -33,8 +33,10 @@
     "unist-util-visit": "^1.0.0"
   },
   "devDependencies": {
+    "browserify": "^13.1.1",
     "dictionary-en-gb": "^1.0.1",
     "dictionary-en-us": "^1.0.1",
+    "esmangle": "^1.0.1",
     "nyc": "^10.0.0",
     "remark-cli": "^2.0.0",
     "remark-preset-wooorm": "^1.0.0",
@@ -44,7 +46,9 @@
   },
   "scripts": {
     "build-md": "remark . -qfo",
-    "build": "npm run build-md",
+    "build-bundle": "browserify index.js --bare -s retextSpell > retext-spell.js",
+    "build-mangle": "esmangle retext-spell.js > retext-spell.min.js",
+    "build": "npm run build-md && npm run build-bundle && npm run build-mangle",
     "lint": "xo",
     "test-api": "node test",
     "test-coverage": "nyc --reporter lcov tape test.js",
