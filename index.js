@@ -167,6 +167,8 @@ function all(tree, file, config) {
 
       message = file.message(reason, node, source);
       message.source = source;
+      message.actual = word;
+      message.expected = suggestions;
     }
   }
 

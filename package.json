@@ -18,7 +18,8 @@
   "contributors": [
     "Titus Wormer <tituswormer@gmail.com> (http://wooorm.com)",
     "Josiah Sprague <josiah.sprague@gmail.com>",
-    "Jan Wirth <jottenwe@gmail.com>"
+    "Jan Wirth <jottenwe@gmail.com>",
+    "Sylvan Swierkosz <sswierkosz@gmail.com>"
   ],
   "files": [
     "index.js"
