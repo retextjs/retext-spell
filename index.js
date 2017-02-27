@@ -14,7 +14,7 @@ var source = 'retext-spell';
 var digitsOnly = /^\d+$/;
 var max = 30;
 
-function spell(retext, options) {
+function spell(options) {
   var queue = [];
   var settings = options || {};
   var load = options && (options.dictionary || options);

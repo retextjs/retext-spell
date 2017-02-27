@@ -33,14 +33,14 @@
     "unist-util-visit": "^1.0.0"
   },
   "devDependencies": {
-    "browserify": "^13.1.1",
+    "browserify": "^14.1.0",
     "dictionary-en-gb": "^1.0.1",
     "dictionary-en-us": "^1.0.1",
     "esmangle": "^1.0.1",
     "nyc": "^10.0.0",
-    "remark-cli": "^2.0.0",
-    "remark-preset-wooorm": "^1.0.0",
-    "retext": "^4.0.0",
+    "remark-cli": "^3.0.0",
+    "remark-preset-wooorm": "^2.0.0",
+    "retext": "^5.0.0",
     "tape": "^4.2.0",
     "xo": "^0.17.1"
   },
@@ -67,6 +67,8 @@
     ]
   },
   "remarkConfig": {
-    "presets": "wooorm"
+    "plugins": [
+      "preset-wooorm"
+    ]
   }
 }

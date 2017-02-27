@@ -7,13 +7,15 @@ var retext = require('retext');
 var spell = require('./');
 
 test('should throw when without `options`', function (t) {
-  t.plan(1);
+  t.throws(
+    function () {
+      retext().use(spell).freeze();
+    },
+    /^Error: Expected `Object`, got `undefined`$/,
+    'should throw'
+  );
 
-  try {
-    retext().use(spell);
-  } catch (err) {
-    t.equal(err.message, 'Expected `Object`, got `undefined`');
-  }
+  t.end();
 });
 
 test('should fail load errors on the VFile', function (t) {
