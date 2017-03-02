@@ -39,7 +39,7 @@ Yields:
 
 ### `retext().use(spell, dictionary|options)`
 
-> **retext-spell** is async; use the async form of [`process`][process].
+> **retext-spell** is async; use [`process`][process], not `processSync`.
 
 Adds warnings for misspelt words to processed [virtual
 file][vfile]s.
@@ -85,10 +85,10 @@ file][vfile]s.
 
 [retext]: https://github.com/wooorm/retext
 
-[process]: https://github.com/wooorm/unified#processorprocessfilevalue-options-done
+[process]: https://github.com/unifiedjs/unified#processorprocessfilevalue-done
 
-[vfile]: https://github.com/wooorm/vfile
+[vfile]: https://github.com/vfile/vfile
 
 [dictionaries]: https://github.com/wooorm/dictionaries
 
-[literal]: https://github.com/wooorm/nlcst-is-literal#isliteralparent-index
+[literal]: https://github.com/syntax-tree/nlcst-is-literal#isliteralparent-index
