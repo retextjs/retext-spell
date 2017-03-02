@@ -248,3 +248,36 @@ test('should `ignore`', function (t) {
     ]);
   });
 });
+
+test('should accept `personal`', function (t) {
+  /* Forbid UK spelling, mark US spelling as correct. */
+  var personal = '*colour\ncolor\n';
+
+  t.plan(2);
+
+  retext()
+    .use(spell, {dictionary: enGB, personal: personal})
+    .process('color coloor colour', function (_, file) {
+      t.deepEqual(
+        file.messages.map(String),
+        [
+          '1:7-1:13: `coloor` is misspelt; did you mean `color`?',
+          '1:14-1:20: `colour` is misspelt; did you mean `dolour`, `colours`, `color`?'
+        ],
+        'as string'
+      );
+    });
+
+  retext()
+    .use(spell, {dictionary: enGB, personal: Buffer.from(personal)})
+    .process('color coloor colour', function (_, file) {
+      t.deepEqual(
+        file.messages.map(String),
+        [
+          '1:7-1:13: `coloor` is misspelt; did you mean `color`?',
+          '1:14-1:20: `colour` is misspelt; did you mean `dolour`, `colours`, `color`?'
+        ],
+        'as buffer'
+      );
+    });
+});

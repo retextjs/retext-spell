@@ -56,6 +56,8 @@ file][vfile]s.
 *   `dictionary` ([`Function`][dictionaries])
     — Result of requiring one of the dictionaries in
     [`wooorm/dictionaries`][dictionaries]
+*   `personal` (`string` or a `Buffer` in `utf8`, optional)
+    — [Personal][] dictionary
 *   `ignore` (`Array.<string>`, default `[]`)
     — List of words to ignore
 *   `ignoreLiteral` (`boolean?`, default `true`)
@@ -97,3 +99,5 @@ file][vfile]s.
 [dictionaries]: https://github.com/wooorm/dictionaries
 
 [literal]: https://github.com/syntax-tree/nlcst-is-literal#isliteralparent-index
+
+[personal]: https://github.com/wooorm/nspell#personal-dictionary-documents

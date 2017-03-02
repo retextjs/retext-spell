@@ -18,9 +18,9 @@ function spell(options) {
   var queue = [];
   var settings = options || {};
   var load = options && (options.dictionary || options);
-  var ignore = settings.ignore;
   var literal = settings.ignoreLiteral;
   var digits = settings.ignoreDigits;
+  var personal = settings.personal;
   var config = {};
   var loadError;
 
@@ -30,7 +30,7 @@ function spell(options) {
 
   config.ignoreLiteral = literal === null || literal === undefined ? true : literal;
   config.ignoreDigits = digits === null || digits === undefined ? true : digits;
-  config.ignore = ignore;
+  config.ignore = settings.ignore;
   config.max = settings.max || max;
   config.count = 0;
   config.cache = {};
@@ -65,6 +65,10 @@ function spell(options) {
 
     if (dictionary) {
       config.checker = nspell(dictionary);
+
+      if (personal) {
+        config.checker.personal(personal);
+      }
     }
 
     while (++index < length) {
