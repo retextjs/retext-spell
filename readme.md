@@ -37,31 +37,36 @@ Yields:
 
 ## API
 
-### `retext().use(spell, dictionary|options)`
+### `retext().use(spell, options)`
 
 > **retext-spell** is async; use [`process`][process], not `processSync`.
 
 Adds warnings for misspelt words to processed [virtual
 file][vfile]s.
 
-###### Parameters
+###### Signatures
+
+*   `retext().use(spell, dictionary)`
+*   `retext().use(spell, options)`
+
+###### `options`
+
+`Object`:
 
 *   `dictionary` ([`Function`][dictionaries])
     — Result of requiring one of the dictionaries in
-    [`wooorm/dictionaries`][dictionaries];
-*   `options` (`Object`):
-    *   `dictionary` — See above;
-    *   `ignore` (`Array.<string>`, default `[]`)
-        — List of words to ignore;
-    *   `ignoreLiteral` (`boolean?`, default `true`)
-        — Whether to ignore [literal words][literal];
-    *   `ignoreDigits` (`boolean?`, default `true`)
-        — Whether to ignore “words” that contain only
-        digits, such as `123456`;
-    *   `max` (`number?`, default `30`)
-        — Number of unique words to suggest for.  By default, up to thirty
-        words are suggested for.  Further misspellings are still warned about,
-        but without suggestions.
+    [`wooorm/dictionaries`][dictionaries]
+*   `ignore` (`Array.<string>`, default `[]`)
+    — List of words to ignore
+*   `ignoreLiteral` (`boolean?`, default `true`)
+    — Whether to ignore [literal words][literal]
+*   `ignoreDigits` (`boolean?`, default `true`)
+    — Whether to ignore “words” that contain only
+    digits, such as `123456`
+*   `max` (`number?`, default `30`)
+    — Number of unique words to suggest for.  By default, up to thirty
+    words are suggested for.  Further misspellings are still warned about,
+    but without suggestions
 
 ## License
 
