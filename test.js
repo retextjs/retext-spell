@@ -46,28 +46,22 @@ test('should fail load errors on the VFile', function (t) {
 });
 
 test('should warn for misspelt words', function (t) {
-  t.plan(6);
+  t.plan(3);
 
-  retext().use(spell, enGB).process('color', function (err, file) {
-    t.ifErr(err);
-
+  retext().use(spell, enGB).process('color', function (_, file) {
     t.deepEqual(file.messages.map(String), [
       '1:1-1:6: `color` is misspelt; did you mean `colon`, `colour`?'
     ]);
   });
 
-  retext().use(spell, enUS).process('colour and utilise', function (err, file) {
-    t.ifErr(err);
-
+  retext().use(spell, enUS).process('colour and utilise', function (_, file) {
     t.deepEqual(file.messages.map(String), [
       '1:1-1:7: `colour` is misspelt; did you mean `color`?',
       '1:12-1:19: `utilise` is misspelt; did you mean `utilize`?'
     ]);
   });
 
-  retext().use(spell, enUS).process('colour and colour and colour', function (err, file) {
-    t.ifErr(err);
-
+  retext().use(spell, enUS).process('colour and colour and colour', function (_, file) {
     t.deepEqual(
       file.messages.map(String),
       [
@@ -82,31 +76,26 @@ test('should warn for misspelt words', function (t) {
 test('should warn for invalid words (coverage)', function (t) {
   var english = retext().use(spell, enGB);
 
-  t.plan(4);
+  t.plan(2);
 
-  english.process('color', function (err, file) {
-    t.ifErr(err);
-
+  english.process('color', function (_, file) {
     t.deepEqual(file.messages.map(String), [
       '1:1-1:6: `color` is misspelt; did you mean `colon`, `colour`?'
     ]);
 
     /* Coverage: future files can start faster. */
-    english.process('colour', function (err, file) {
-      t.ifErr(err);
+    english.process('colour', function (_, file) {
       t.deepEqual(file.messages.map(String), []);
     });
   });
 });
 
 test('should support `max`, for maximum suggestions', function (t) {
-  t.plan(2);
+  t.plan(1);
 
   retext()
     .use(spell, {dictionary: enGB, max: 1})
-    .process('Some useles mispelt documeant', function (err, file) {
-      t.ifErr(err);
-
+    .process('Some useles mispelt documeant', function (_, file) {
       t.deepEqual(
         file.messages.map(String),
         [
@@ -120,115 +109,101 @@ test('should support `max`, for maximum suggestions', function (t) {
 });
 
 test('should ignore literal words', function (t) {
-  t.plan(2);
+  t.plan(1);
 
-  retext().use(spell, enGB).process('“color”', function (err, file) {
-    t.ifErr(err);
+  retext().use(spell, enGB).process('“color”', function (_, file) {
     t.deepEqual(file.messages.map(String), []);
   });
 });
 
 test('...unless `ignoreLiteral` is false', function (t) {
-  t.plan(2);
+  t.plan(1);
 
-  retext().use(spell, {
-    dictionary: enGB,
-    ignoreLiteral: false
-  }).process('“color”', function (err, file) {
-    t.ifErr(err);
-    t.deepEqual(
-      file.messages.map(String),
-      ['1:2-1:7: `color` is misspelt; did you mean `colon`, `colour`?']
-    );
-  });
+  retext()
+    .use(spell, {dictionary: enGB, ignoreLiteral: false})
+    .process('“color”', function (_, file) {
+      t.deepEqual(
+        file.messages.map(String),
+        ['1:2-1:7: `color` is misspelt; did you mean `colon`, `colour`?']
+      );
+    });
 });
 
 test('should warn for misspelt hyphenated words', function (t) {
-  t.plan(2);
+  t.plan(1);
 
-  retext().use(spell, {
-    dictionary: enGB,
-    ignoreDigits: false
-  }).process('wrongely-spelled-word', function (err, file) {
-    t.ifErr(err);
-    t.deepEqual(file.messages.map(String), [
-      '1:1-1:22: `wrongely-spelled-word` is misspelt'
-    ]);
-  });
+  retext()
+    .use(spell, {dictionary: enGB, ignoreDigits: false})
+    .process('wrongely-spelled-word', function (_, file) {
+      t.deepEqual(file.messages.map(String), [
+        '1:1-1:22: `wrongely-spelled-word` is misspelt'
+      ]);
+    });
 });
 
 test('should not warn for correctly spelled hyphenated words', function (t) {
-  t.plan(2);
+  t.plan(1);
 
-  retext().use(spell, enGB).process('random-hyphenated-word', function (err, file) {
-    t.ifErr(err);
+  retext().use(spell, enGB).process('random-hyphenated-word', function (_, file) {
     t.deepEqual(file.messages.map(String), []);
   });
 });
 
 test('should not warn for ignored words in hyphenated words', function (t) {
-  t.plan(2);
+  t.plan(1);
 
   retext().use(spell, {
     dictionary: enGB,
     ignore: ['wrongely']
-  }).process('wrongely-spelled-word', function (err, file) {
-    t.ifErr(err);
+  }).process('wrongely-spelled-word', function (_, file) {
     t.deepEqual(file.messages.map(String), []);
   });
 });
 
 test('should ignore digits', function (t) {
-  t.plan(2);
+  t.plan(1);
 
-  retext().use(spell, enGB).process('123456', function (err, file) {
-    t.ifErr(err);
+  retext().use(spell, enGB).process('123456', function (_, file) {
     t.deepEqual(file.messages.map(String), []);
   });
 });
 
 test('...unless `ignoreDigits` is false', function (t) {
-  t.plan(2);
+  t.plan(1);
 
-  retext().use(spell, {
-    dictionary: enGB,
-    ignoreDigits: false
-  }).process('123456', function (err, file) {
-    t.ifErr(err);
-    t.deepEqual(file.messages.map(String), [
-      '1:1-1:7: `123456` is misspelt'
-    ]);
-  });
+  retext()
+    .use(spell, {dictionary: enGB, ignoreDigits: false})
+    .process('123456', function (_, file) {
+      t.deepEqual(file.messages.map(String), [
+        '1:1-1:7: `123456` is misspelt'
+      ]);
+    });
 });
 
 test('should ignore digits with decimals', function (t) {
-  t.plan(2);
+  t.plan(1);
 
-  retext().use(spell, enGB).process('3.14', function (err, file) {
-    t.ifErr(err);
+  retext().use(spell, enGB).process('3.14', function (_, file) {
     t.deepEqual(file.messages.map(String), []);
   });
 });
 
 test('...unless `ignoreDigits` is false', function (t) {
-  t.plan(2);
+  t.plan(1);
 
-  retext().use(spell, {
-    dictionary: enGB,
-    ignoreDigits: false
-  }).process('3.15', function (err, file) {
-    t.ifErr(err);
-    t.deepEqual(file.messages.map(String), [
-      '1:1-1:5: `3.15` is misspelt'
-    ]);
-  });
+  retext()
+    .use(spell, {dictionary: enGB, ignoreDigits: false})
+    .process('3.15', function (_, file) {
+      t.deepEqual(file.messages.map(String), [
+        '1:1-1:5: `3.15` is misspelt'
+      ]);
+    });
 });
 
 test('should not ignore words that include digits', function (t) {
-  t.plan(2);
+  t.plan(1);
 
-  retext().use(spell, enGB).process('768x1024', function (err, file) {
-    t.ifErr(err);
+  retext().use(spell, enGB).process('768x1024', function (_, file) {
     t.deepEqual(file.messages.map(String), [
       '1:1-1:9: `768x1024` is misspelt'
     ]);
@@ -236,17 +211,15 @@ test('should not ignore words that include digits', function (t) {
 });
 
 test('should `ignore`', function (t) {
-  t.plan(2);
+  t.plan(1);
 
-  retext().use(spell, {
-    dictionary: enGB,
-    ignore: ['color']
-  }).process('color coloor', function (err, file) {
-    t.ifErr(err);
-    t.deepEqual(file.messages.map(String), [
-      '1:7-1:13: `coloor` is misspelt; did you mean `colour`?'
-    ]);
-  });
+  retext()
+    .use(spell, {dictionary: enGB, ignore: ['color']})
+    .process('color coloor', function (_, file) {
+      t.deepEqual(file.messages.map(String), [
+        '1:7-1:13: `coloor` is misspelt; did you mean `colour`?'
+      ]);
+    });
 });
 
 test('should accept `personal`', function (t) {
