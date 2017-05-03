@@ -93,8 +93,6 @@ function all(tree, file, config) {
 
   visit(tree, 'WordNode', checkWord);
 
-  return;
-
   /* Check one word. */
   function checkWord(node, position, parent) {
     var children = node.children;
