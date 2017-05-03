@@ -133,7 +133,7 @@ test('should warn for misspelt hyphenated words', function (t) {
   t.plan(1);
 
   retext()
-    .use(spell, {dictionary: enGB, ignoreDigits: false})
+    .use(spell, enGB)
     .process('wrongely-spelled-word', function (_, file) {
       t.deepEqual(file.messages.map(String), [
         '1:1-1:22: `wrongely-spelled-word` is misspelt'
