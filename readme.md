@@ -65,6 +65,10 @@ file][vfile]s.
 *   `ignoreDigits` (`boolean?`, default `true`)
     — Whether to ignore “words” that contain only
     digits, such as `123456`
+*   `normalizeApostrophes` (`boolean?`, default `true`)
+    — Whether to swap smart apostrophes (`’`) with straight apostrophes (`'`)
+    before checking spelling.  Most dictionaries do recognise straight
+    apostrophes (`isn't`), but not smart apostrophes (`isn’t`).
 *   `max` (`number?`, default `30`)
     — Number of unique words to suggest for.  By default, up to thirty
     words are suggested for.  Further misspellings are still warned about,

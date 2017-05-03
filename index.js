@@ -12,6 +12,8 @@ module.exports = spell;
 
 var source = 'retext-spell';
 var digitsOnly = /^\d+$/;
+var smart = /’/g;
+var straight = '\'';
 var max = 30;
 
 function spell(options) {
@@ -20,6 +22,7 @@ function spell(options) {
   var load = options && (options.dictionary || options);
   var literal = settings.ignoreLiteral;
   var digits = settings.ignoreDigits;
+  var apos = settings.normalizeApostrophes;
   var personal = settings.personal;
   var config = {};
   var loadError;
@@ -30,6 +33,7 @@ function spell(options) {
 
   config.ignoreLiteral = literal === null || literal === undefined ? true : literal;
   config.ignoreDigits = digits === null || digits === undefined ? true : digits;
+  config.normalizeApostrophes = apos === null || apos === undefined ? true : apos;
   config.ignore = settings.ignore;
   config.max = settings.max || max;
   config.count = 0;
@@ -88,6 +92,7 @@ function all(tree, file, config) {
   var ignore = config.ignore;
   var ignoreLiteral = config.ignoreLiteral;
   var ignoreDigits = config.ignoreDigits;
+  var apos = config.normalizeApostrophes;
   var checker = config.checker;
   var cache = config.cache;
 
@@ -107,6 +112,10 @@ function all(tree, file, config) {
 
     if (ignoreLiteral && isLiteral(parent, position)) {
       return;
+    }
+
+    if (apos) {
+      word = word.replace(smart, straight);
     }
 
     if (irrelevant(word)) {

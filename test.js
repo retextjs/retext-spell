@@ -168,6 +168,35 @@ test('should ignore digits', function (t) {
   });
 });
 
+test('should treat smart apostrophes as straight apostrophes', function (t) {
+  t.plan(4);
+
+  retext().use(spell, enGB).process('It doesn’t work', function (_, file) {
+    t.deepEqual(file.messages.map(String), []);
+  });
+
+  retext().use(spell, enGB).process('It doesn\'t work.', function (_, file) {
+    t.deepEqual(file.messages.map(String), []);
+  });
+
+  retext().use(spell, {
+    dictionary: enGB,
+    normalizeApostrophes: false
+  }).process('It doesn’t work', function (_, file) {
+    t.deepEqual(
+      file.messages.map(String),
+      ['1:4-1:11: `doesn’t` is misspelt; did you mean `doesn\'t`?']
+    );
+  });
+
+  retext().use(spell, {
+    dictionary: enGB,
+    normalizeApostrophes: false
+  }).process('It doesn\'t work', function (_, file) {
+    t.deepEqual(file.messages.map(String), []);
+  });
+});
+
 test('...unless `ignoreDigits` is false', function (t) {
   t.plan(1);
 
