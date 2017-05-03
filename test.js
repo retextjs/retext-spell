@@ -271,7 +271,7 @@ test('should accept `personal`', function (t) {
     });
 
   retext()
-    .use(spell, {dictionary: enGB, personal: Buffer.from(personal)})
+    .use(spell, {dictionary: enGB, personal: new Buffer(personal)})
     .process('color coloor colour', function (_, file) {
       t.deepEqual(
         file.messages.map(String),

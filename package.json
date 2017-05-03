@@ -65,7 +65,8 @@
     "space": true,
     "esnext": false,
     "rules": {
-      "unicorn/prefer-type-error": "off"
+      "unicorn/prefer-type-error": "off",
+      "unicorn/no-new-buffer": "off"
     },
     "ignores": [
       "retext-spell.js"
