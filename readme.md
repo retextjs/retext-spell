@@ -74,6 +74,21 @@ file][vfile]s.
     words are suggested for.  Further misspellings are still warned about,
     but without suggestions
 
+## Related
+
+*   [`retext-contractions`](https://github.com/wooorm/retext-contractions)
+    — Check apostrophe use in contractions
+*   [`retext-diacritics`](https://github.com/wooorm/retext-diacritics)
+    — Check for proper use of diacritics
+*   [`retext-indefinite-article`](https://github.com/wooorm/retext-indefinite-article)
+    — Check if indefinite articles (`a`, `an`) are used correctly
+*   [`retext-redundant-acronyms`](https://github.com/wooorm/retext-redundant-acronyms)
+    — Check for redundant acronyms (`ATM machine`)
+*   [`retext-repeated-words`](https://github.com/wooorm/retext-repeated-words)
+    — Check `for for` repeated words
+*   [`retext-syntax-mentions`](https://github.com/wooorm/retext-syntax-mentions)
+    — Classify @mentions as syntax
+
 ## License
 
 [MIT][license] © [Titus Wormer][author]
