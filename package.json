@@ -38,7 +38,7 @@
     "dictionary-en-gb": "^1.0.1",
     "dictionary-en-us": "^1.0.1",
     "esmangle": "^1.0.1",
-    "nyc": "^10.0.0",
+    "nyc": "^11.0.0",
     "remark-cli": "^3.0.0",
     "remark-preset-wooorm": "^3.0.0",
     "retext": "^5.0.0",
