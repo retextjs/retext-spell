@@ -25,7 +25,6 @@
     "index.js"
   ],
   "dependencies": {
-    "has": "^1.0.1",
     "lodash.includes": "^4.2.0",
     "nlcst-is-literal": "^1.0.0",
     "nlcst-to-string": "^2.0.0",

@@ -1,7 +1,6 @@
 'use strict';
 
 var nspell = require('nspell');
-var has = require('has');
 var visit = require('unist-util-visit');
 var toString = require('nlcst-to-string');
 var isLiteral = require('nlcst-is-literal');
@@ -9,6 +8,8 @@ var includes = require('lodash.includes');
 var quote = require('quotation');
 
 module.exports = spell;
+
+var own = {}.hasOwnProperty;
 
 var source = 'retext-spell';
 var digitsOnly = /^\d+$/;
@@ -143,7 +144,7 @@ function all(tree, file, config) {
     }
 
     if (!correct) {
-      if (has(cache, word)) {
+      if (own.call(cache, word)) {
         reason = cache[word];
       } else {
         reason = quote(word, '`') + ' is misspelt';
