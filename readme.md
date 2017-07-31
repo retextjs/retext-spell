@@ -44,35 +44,49 @@ Yields:
 Adds warnings for misspelt words to processed [virtual
 file][vfile]s.
 
-###### Signatures
+##### Signatures
 
 *   `retext().use(spell, dictionary)`
 *   `retext().use(spell, options)`
 
-###### `options`
+##### `options`
 
-`Object`:
+Optional object.
 
-*   `dictionary` ([`Function`][dictionaries])
-    — Result of requiring one of the dictionaries in
-    [`wooorm/dictionaries`][dictionaries]
-*   `personal` (`string` or a `Buffer` in `utf8`, optional)
-    — [Personal][] dictionary
-*   `ignore` (`Array.<string>`, default `[]`)
-    — List of words to ignore
-*   `ignoreLiteral` (`boolean?`, default `true`)
-    — Whether to ignore [literal words][literal]
-*   `ignoreDigits` (`boolean?`, default `true`)
-    — Whether to ignore “words” that contain only
-    digits, such as `123456`
-*   `normalizeApostrophes` (`boolean?`, default `true`)
-    — Whether to swap smart apostrophes (`’`) with straight apostrophes (`'`)
-    before checking spelling.  Most dictionaries do recognise straight
-    apostrophes (`isn't`), but not smart apostrophes (`isn’t`).
-*   `max` (`number?`, default `30`)
-    — Number of unique words to suggest for.  By default, up to thirty
-    words are suggested for.  Further misspellings are still warned about,
-    but without suggestions
+###### `options.dictionary`
+
+A dictionary ([`Function`][dictionaries]).  Result of requiring one of the
+dictionaries in [`wooorm/dictionaries`][dictionaries].
+
+###### `options.personal`
+
+[Personal][] dictionary (`string` or a `Buffer` in `utf8`, optional).
+
+###### `options.ignore`
+
+List of words to ignore (`Array.<string>`, default `[]`).
+
+###### `options.ignoreLiteral`
+
+Whether to ignore [literal words][literal] (`boolean?`, default `true`).
+
+###### `options.ignoreDigits`
+
+Whether to ignore “words” that contain only digits, such as `123456`
+(`boolean?`, default `true`).
+
+###### `options.normalizeApostrophes`
+
+Deal with apostrophes (`boolean?`, default `true`).  Whether to swap smart
+apostrophes (`’`) with straight apostrophes (`'`) before checking spelling.
+Most dictionaries do recognise straight apostrophes (`isn't`), but not smart
+apostrophes (`isn’t`).
+
+###### `options.max`
+
+Number of unique words to suggest for (`number?`, default `30`).  By default,
+up to thirty words are suggested for.  Further misspellings are still warned
+about, but without suggestions
 
 ## Related
 
