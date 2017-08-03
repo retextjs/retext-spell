@@ -20,7 +20,7 @@ var report = require('vfile-reporter');
 
 retext()
   .use(spell, dictionary)
-  .process('Some useles mispelt documeant.', function (err, file) {
+  .process('Some useles documeant.', function (err, file) {
     console.error(report(err || file));
   });
 ```
@@ -29,10 +29,9 @@ Yields:
 
 ```txt
    1:6-1:12  warning  `useles` is misspelt; did you mean `useless`?      retext-spell  retext-spell
-  1:13-1:20  warning  `mispelt` is misspelt; did you mean `misspelt`?    retext-spell  retext-spell
-  1:21-1:30  warning  `documeant` is misspelt; did you mean `document`?  retext-spell  retext-spell
+  1:13-1:22  warning  `documeant` is misspelt; did you mean `document`?  retext-spell  retext-spell
 
-⚠ 3 warnings
+⚠ 2 warnings
 ```
 
 ## API

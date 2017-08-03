@@ -50,7 +50,7 @@ test('should warn for misspelt words', function (t) {
 
   retext().use(spell, enGB).process('color', function (_, file) {
     t.deepEqual(file.messages.map(String), [
-      '1:1-1:6: `color` is misspelt; did you mean `colon`, `colour`?'
+      '1:1-1:6: `color` is misspelt; did you mean `colon`, `colour`, `Colo`?'
     ]);
   });
 
@@ -80,7 +80,7 @@ test('should warn for invalid words (coverage)', function (t) {
 
   english.process('color', function (_, file) {
     t.deepEqual(file.messages.map(String), [
-      '1:1-1:6: `color` is misspelt; did you mean `colon`, `colour`?'
+      '1:1-1:6: `color` is misspelt; did you mean `colon`, `colour`, `Colo`?'
     ]);
 
     /* Coverage: future files can start faster. */
@@ -124,7 +124,7 @@ test('...unless `ignoreLiteral` is false', function (t) {
     .process('“color”', function (_, file) {
       t.deepEqual(
         file.messages.map(String),
-        ['1:2-1:7: `color` is misspelt; did you mean `colon`, `colour`?']
+        ['1:2-1:7: `color` is misspelt; did you mean `colon`, `colour`, `Colo`?']
       );
     });
 });
@@ -185,7 +185,7 @@ test('should treat smart apostrophes as straight apostrophes', function (t) {
   }).process('It doesn’t work', function (_, file) {
     t.deepEqual(
       file.messages.map(String),
-      ['1:4-1:11: `doesn’t` is misspelt; did you mean `doesn\'t`?']
+      ['1:4-1:11: `doesn’t` is misspelt']
     );
   });
 
@@ -204,7 +204,7 @@ test('...unless `ignoreDigits` is false', function (t) {
     .use(spell, {dictionary: enGB, ignoreDigits: false})
     .process('123456', function (_, file) {
       t.deepEqual(file.messages.map(String), [
-        '1:1-1:7: `123456` is misspelt'
+        '1:1-1:7: `123456` is misspelt; did you mean `12th456`, `12th3456`, `12th56`?'
       ]);
     });
 });
@@ -224,7 +224,7 @@ test('...unless `ignoreDigits` is false', function (t) {
     .use(spell, {dictionary: enGB, ignoreDigits: false})
     .process('3.15', function (_, file) {
       t.deepEqual(file.messages.map(String), [
-        '1:1-1:5: `3.15` is misspelt'
+        '1:1-1:5: `3.15` is misspelt; did you mean `3.15th`?'
       ]);
     });
 });
@@ -234,7 +234,7 @@ test('should not ignore words that include digits', function (t) {
 
   retext().use(spell, enGB).process('768x1024', function (_, file) {
     t.deepEqual(file.messages.map(String), [
-      '1:1-1:9: `768x1024` is misspelt'
+      '1:1-1:9: `768x1024` is misspelt; did you mean `76thx1024`, `76th8x1024`, `76th1024`?'
     ]);
   });
 });

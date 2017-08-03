@@ -34,8 +34,8 @@
   },
   "devDependencies": {
     "browserify": "^14.1.0",
-    "dictionary-en-gb": "^1.0.1",
-    "dictionary-en-us": "^1.0.1",
+    "dictionary-en-gb": "^2.0.0",
+    "dictionary-en-us": "^2.0.0",
     "esmangle": "^1.0.1",
     "nyc": "^11.0.0",
     "remark-cli": "^4.0.0",
