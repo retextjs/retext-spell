@@ -101,7 +101,9 @@ about, but without suggestions
 *   [`retext-repeated-words`](https://github.com/wooorm/retext-repeated-words)
     — Check `for for` repeated words
 *   [`retext-syntax-mentions`](https://github.com/wooorm/retext-syntax-mentions)
-    — Classify @mentions as syntax
+    — Classify [**@mentions**](https://github.com/blog/821) as syntax
+*   [`retext-syntax-urls`](https://github.com/wooorm/retext-syntax-urls)
+    — Classify URLs and filepaths as syntax
 
 ## License
 
