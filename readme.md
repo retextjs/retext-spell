@@ -1,6 +1,6 @@
 # retext-spell [![Build Status][travis-badge]][travis] [![Coverage Status][codecov-badge]][codecov]
 
-Check spelling with [**retext**][retext].
+Check spelling with [**retext**][retext], based on [`nspell`][nspell].
 
 ## Installation
 
@@ -89,19 +89,19 @@ about, but without suggestions
 
 ## Related
 
-*   [`retext-contractions`](https://github.com/wooorm/retext-contractions)
+*   [`retext-contractions`](https://github.com/retextjs/retext-contractions)
     — Check apostrophe use in contractions
-*   [`retext-diacritics`](https://github.com/wooorm/retext-diacritics)
+*   [`retext-diacritics`](https://github.com/retextjs/retext-diacritics)
     — Check for proper use of diacritics
-*   [`retext-indefinite-article`](https://github.com/wooorm/retext-indefinite-article)
+*   [`retext-indefinite-article`](https://github.com/retextjs/retext-indefinite-article)
     — Check if indefinite articles (`a`, `an`) are used correctly
-*   [`retext-redundant-acronyms`](https://github.com/wooorm/retext-redundant-acronyms)
+*   [`retext-redundant-acronyms`](https://github.com/retextjs/retext-redundant-acronyms)
     — Check for redundant acronyms (`ATM machine`)
-*   [`retext-repeated-words`](https://github.com/wooorm/retext-repeated-words)
+*   [`retext-repeated-words`](https://github.com/retextjs/retext-repeated-words)
     — Check `for for` repeated words
-*   [`retext-syntax-mentions`](https://github.com/wooorm/retext-syntax-mentions)
+*   [`retext-syntax-mentions`](https://github.com/retextjs/retext-syntax-mentions)
     — Classify [**@mentions**](https://github.com/blog/821) as syntax
-*   [`retext-syntax-urls`](https://github.com/wooorm/retext-syntax-urls)
+*   [`retext-syntax-urls`](https://github.com/retextjs/retext-syntax-urls)
     — Classify URLs and filepaths as syntax
 
 ## License
@@ -110,13 +110,13 @@ about, but without suggestions
 
 <!-- Definitions -->
 
-[travis-badge]: https://img.shields.io/travis/wooorm/retext-spell.svg
+[travis-badge]: https://img.shields.io/travis/retextjs/retext-spell.svg
 
-[travis]: https://travis-ci.org/wooorm/retext-spell
+[travis]: https://travis-ci.org/retextjs/retext-spell
 
-[codecov-badge]: https://img.shields.io/codecov/c/github/wooorm/retext-spell.svg
+[codecov-badge]: https://img.shields.io/codecov/c/github/retextjs/retext-spell.svg
 
-[codecov]: https://codecov.io/github/wooorm/retext-spell
+[codecov]: https://codecov.io/github/retextjs/retext-spell
 
 [npm]: https://docs.npmjs.com/cli/install
 
@@ -124,13 +124,15 @@ about, but without suggestions
 
 [author]: http://wooorm.com
 
-[retext]: https://github.com/wooorm/retext
+[retext]: https://github.com/retextjs/retext
 
 [process]: https://github.com/unifiedjs/unified#processorprocessfilevalue-done
 
 [vfile]: https://github.com/vfile/vfile
 
-[dictionaries]: https://github.com/wooorm/dictionaries
+[dictionaries]: https://github.com/retextjs/dictionaries
+
+[nspell]: https://github.com/wooorm/nspell
 
 [literal]: https://github.com/syntax-tree/nlcst-is-literal#isliteralparent-index
 

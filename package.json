@@ -12,8 +12,8 @@
     "autocorrect",
     "retext"
   ],
-  "repository": "https://github.com/wooorm/retext-spell",
-  "bugs": "https://github.com/wooorm/retext-spell/issues",
+  "repository": "retextjs/retext-spell",
+  "bugs": "https://github.com/retextjs/retext-spell/issues",
   "author": "Titus Wormer <tituswormer@gmail.com> (http://wooorm.com)",
   "contributors": [
     "Titus Wormer <tituswormer@gmail.com> (http://wooorm.com)",
