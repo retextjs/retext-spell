@@ -104,6 +104,13 @@ about, but without suggestions
 *   [`retext-syntax-urls`](https://github.com/retextjs/retext-syntax-urls)
     — Classify URLs and filepaths as syntax
 
+## Contribute
+
+See [`contribute.md` in `retextjs/retext`][contribute] for ways to get started.
+
+This organisation has a [Code of Conduct][coc].  By interacting with this
+repository, organisation, or community you agree to abide by its terms.
+
 ## License
 
 [MIT][license] © [Titus Wormer][author]
@@ -137,3 +144,7 @@ about, but without suggestions
 [literal]: https://github.com/syntax-tree/nlcst-is-literal#isliteralparent-index
 
 [personal]: https://github.com/wooorm/nspell#personal-dictionary-documents
+
+[contribute]: https://github.com/retextjs/retext/blob/master/contributing.md
+
+[coc]: https://github.com/retextjs/retext/blob/master/code-of-conduct.md
