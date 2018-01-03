@@ -44,7 +44,7 @@ function spell(options) {
 
   return transformer;
 
-  /* Transformer which either immediatly invokes `all`
+  /* Transformer which either immediately invokes `all`
    * when everything has finished loading or queues
    * the arguments. */
   function transformer(tree, file, next) {
