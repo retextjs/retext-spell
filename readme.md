@@ -55,7 +55,7 @@ Optional object.
 ###### `options.dictionary`
 
 A dictionary ([`Function`][dictionaries]).  Result of requiring one of the
-dictionaries in [`wooorm/dictionaries`][dictionaries].
+dictionaries in [`wooorm/dictionaries`](https://github.com/wooorm/dictionaries).
 
 ###### `options.personal`
 
