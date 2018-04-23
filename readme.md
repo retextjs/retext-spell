@@ -55,7 +55,7 @@ Optional object.
 ###### `options.dictionary`
 
 A dictionary ([`Function`][dictionaries]).  Result of requiring one of the
-dictionaries in [`wooorm/dictionaries`](https://github.com/wooorm/dictionaries).
+dictionaries in [`wooorm/dictionaries`][dictionaries].
 
 ###### `options.personal`
 
@@ -137,7 +137,7 @@ repository, organisation, or community you agree to abide by its terms.
 
 [vfile]: https://github.com/vfile/vfile
 
-[dictionaries]: https://github.com/retextjs/dictionaries
+[dictionaries]: https://github.com/wooorm/dictionaries
 
 [nspell]: https://github.com/wooorm/nspell
 
