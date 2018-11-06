@@ -5,7 +5,7 @@ var test = require('tape');
 var enUS = require('dictionary-en-us');
 var enGB = require('dictionary-en-gb');
 var retext = require('retext');
-var spell = require('./');
+var spell = require('.');
 
 test('should throw when without `options`', function (t) {
   t.throws(
@@ -242,7 +242,7 @@ test('should accept `personal`', function (t) {
     });
 
   retext()
-    .use(spell, {dictionary: enGB, personal: new Buffer(personal)})
+    .use(spell, {dictionary: enGB, personal: Buffer.from(personal)})
     .process('color coloor colour', function (_, file) {
       check(t, file, [
         '1:7-1:13: `coloor` is misspelt',
@@ -258,7 +258,7 @@ function check(t, file, expected) {
     var index = -1;
 
     while (++index < length) {
-      assert.equal(String(messages[index]).indexOf(expected[index]), 0, expected[index]);
+      assert.strictEqual(String(messages[index]).indexOf(expected[index]), 0, expected[index]);
     }
   });
 }
