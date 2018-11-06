@@ -1,187 +1,188 @@
-'use strict';
+'use strict'
 
-var nspell = require('nspell');
-var visit = require('unist-util-visit');
-var toString = require('nlcst-to-string');
-var isLiteral = require('nlcst-is-literal');
-var includes = require('lodash.includes');
-var quote = require('quotation');
+var nspell = require('nspell')
+var visit = require('unist-util-visit')
+var toString = require('nlcst-to-string')
+var isLiteral = require('nlcst-is-literal')
+var includes = require('lodash.includes')
+var quote = require('quotation')
 
-module.exports = spell;
+module.exports = spell
 
-var own = {}.hasOwnProperty;
+var own = {}.hasOwnProperty
 
-var source = 'retext-spell';
-var digitsOnly = /^\d+$/;
-var smart = /’/g;
-var straight = '\'';
-var max = 30;
+var source = 'retext-spell'
+var digitsOnly = /^\d+$/
+var smart = /’/g
+var straight = "'"
+var max = 30
 
 function spell(options) {
-  var queue = [];
-  var settings = options || {};
-  var load = options && (options.dictionary || options);
-  var literal = settings.ignoreLiteral;
-  var digits = settings.ignoreDigits;
-  var apos = settings.normalizeApostrophes;
-  var personal = settings.personal;
-  var config = {};
-  var loadError;
+  var queue = []
+  var settings = options || {}
+  var load = options && (options.dictionary || options)
+  var literal = settings.ignoreLiteral
+  var digits = settings.ignoreDigits
+  var apos = settings.normalizeApostrophes
+  var personal = settings.personal
+  var config = {}
+  var loadError
 
   if (typeof load !== 'function') {
-    throw new Error('Expected `Object`, got `' + load + '`');
+    throw new Error('Expected `Object`, got `' + load + '`')
   }
 
-  config.ignoreLiteral = literal === null || literal === undefined ? true : literal;
-  config.ignoreDigits = digits === null || digits === undefined ? true : digits;
-  config.normalizeApostrophes = apos === null || apos === undefined ? true : apos;
-  config.ignore = settings.ignore;
-  config.max = settings.max || max;
-  config.count = 0;
-  config.cache = {};
+  config.ignoreLiteral =
+    literal === null || literal === undefined ? true : literal
+  config.ignoreDigits = digits === null || digits === undefined ? true : digits
+  config.normalizeApostrophes =
+    apos === null || apos === undefined ? true : apos
+  config.ignore = settings.ignore
+  config.max = settings.max || max
+  config.count = 0
+  config.cache = {}
 
-  load(construct);
+  load(construct)
 
-  return transformer;
+  return transformer
 
-  /* Transformer which either immediately invokes `all`
-   * when everything has finished loading or queues
-   * the arguments. */
+  // Transformer which either immediately invokes `all` when everything has
+  // finished loading or queues the arguments.
   function transformer(tree, file, next) {
     if (loadError) {
-      next(loadError);
+      next(loadError)
     } else if (config.checker) {
-      all(tree, file, config);
-      next();
+      all(tree, file, config)
+      next()
     } else {
-      queue.push([tree, file, config, next]);
+      queue.push([tree, file, config, next])
     }
   }
 
-  /* Callback invoked when a `dictionary` is loaded
-   * (possibly erroneous) or when `load`ing failed.
-   * Flushes the queue when available, and sets the
-   * results on the parent scope. */
+  // Callback invoked when a `dictionary` is loaded (possibly erroneous) or
+  // when `load`ing failed.  Flushes the queue when available, and sets the
+  // results on the parent scope.
   function construct(err, dictionary) {
-    var length = queue.length;
-    var index = -1;
+    var length = queue.length
+    var index = -1
 
-    loadError = err;
+    loadError = err
 
     if (dictionary) {
-      config.checker = nspell(dictionary);
+      config.checker = nspell(dictionary)
 
       if (personal) {
-        config.checker.personal(personal);
+        config.checker.personal(personal)
       }
     }
 
     while (++index < length) {
       if (!err) {
-        all.apply(null, queue[index]);
+        all.apply(null, queue[index])
       }
 
-      queue[index][3](err);
+      queue[index][3](err)
     }
 
-    queue = [];
+    queue = []
   }
 }
 
-/* Check a file for spelling mistakes. */
+// Check a file for spelling mistakes.
 function all(tree, file, config) {
-  var ignore = config.ignore;
-  var ignoreLiteral = config.ignoreLiteral;
-  var ignoreDigits = config.ignoreDigits;
-  var apos = config.normalizeApostrophes;
-  var checker = config.checker;
-  var cache = config.cache;
+  var ignore = config.ignore
+  var ignoreLiteral = config.ignoreLiteral
+  var ignoreDigits = config.ignoreDigits
+  var apos = config.normalizeApostrophes
+  var checker = config.checker
+  var cache = config.cache
 
-  visit(tree, 'WordNode', checkWord);
+  visit(tree, 'WordNode', checkWord)
 
-  /* Check one word. */
+  // Check one word.
   function checkWord(node, position, parent) {
-    var children = node.children;
-    var word = toString(node);
-    var correct;
-    var length;
-    var index;
-    var child;
-    var reason;
-    var message;
-    var suggestions;
+    var children = node.children
+    var word = toString(node)
+    var correct
+    var length
+    var index
+    var child
+    var reason
+    var message
+    var suggestions
 
     if (ignoreLiteral && isLiteral(parent, position)) {
-      return;
+      return
     }
 
     if (apos) {
-      word = word.replace(smart, straight);
+      word = word.replace(smart, straight)
     }
 
     if (irrelevant(word)) {
-      return;
+      return
     }
 
-    correct = checker.correct(word);
+    correct = checker.correct(word)
 
     if (!correct && children.length > 1) {
-      correct = true;
-      length = children.length;
-      index = -1;
+      correct = true
+      length = children.length
+      index = -1
 
       while (++index < length) {
-        child = children[index];
+        child = children[index]
 
         if (child.type !== 'TextNode' || irrelevant(child.value)) {
-          continue;
+          continue
         }
 
         if (!checker.correct(child.value)) {
-          correct = false;
+          correct = false
         }
       }
     }
 
     if (!correct) {
       if (own.call(cache, word)) {
-        reason = cache[word];
+        reason = cache[word]
       } else {
-        reason = quote(word, '`') + ' is misspelt';
+        reason = quote(word, '`') + ' is misspelt'
 
         if (config.count === config.max) {
           message = file.message(
             'Too many misspellings; no further spell suggestions are given',
             node,
             'overflow'
-          );
+          )
 
-          message.source = source;
+          message.source = source
         }
 
-        config.count++;
+        config.count++
 
         if (config.count < config.max) {
-          suggestions = checker.suggest(word);
+          suggestions = checker.suggest(word)
 
           if (suggestions.length !== 0) {
-            reason += '; did you mean ' + quote(suggestions, '`').join(', ') + '?';
-            cache[word] = reason;
+            reason +=
+              '; did you mean ' + quote(suggestions, '`').join(', ') + '?'
+            cache[word] = reason
           }
         }
 
-        cache[word] = reason;
+        cache[word] = reason
       }
 
-      message = file.message(reason, node, source);
-      message.source = source;
-      message.actual = word;
-      message.expected = suggestions;
+      message = file.message(reason, node, source)
+      message.source = source
+      message.actual = word
+      message.expected = suggestions
     }
   }
 
-  /* Check if a word is irrelevant. */
+  // Check if a word is irrelevant.
   function irrelevant(word) {
-    return includes(ignore, word) || (ignoreDigits && digitsOnly.test(word));
+    return includes(ignore, word) || (ignoreDigits && digitsOnly.test(word))
   }
 }

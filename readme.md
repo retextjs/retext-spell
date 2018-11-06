@@ -13,16 +13,16 @@ npm install retext-spell
 ## Usage
 
 ```js
-var retext = require('retext');
-var spell = require('retext-spell');
-var dictionary = require('dictionary-en-gb');
-var report = require('vfile-reporter');
+var retext = require('retext')
+var spell = require('retext-spell')
+var dictionary = require('dictionary-en-gb')
+var report = require('vfile-reporter')
 
 retext()
   .use(spell, dictionary)
-  .process('Some useles documeant.', function (err, file) {
-    console.error(report(err || file));
-  });
+  .process('Some useles documeant.', function(err, file) {
+    console.error(report(err || file))
+  })
 ```
 
 Yields:
