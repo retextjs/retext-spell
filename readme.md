@@ -1,4 +1,4 @@
-# retext-spell [![Build Status][travis-badge]][travis] [![Coverage Status][codecov-badge]][codecov]
+# retext-spell [![Build][build-badge]][build] [![Coverage][coverage-badge]][coverage] [![Downloads][downloads-badge]][downloads] [![Chat][chat-badge]][chat]
 
 Check spelling with [**retext**][retext], based on [`nspell`][nspell].
 
@@ -118,13 +118,21 @@ repository, organisation, or community you agree to abide by its terms.
 
 <!-- Definitions -->
 
-[travis-badge]: https://img.shields.io/travis/retextjs/retext-spell.svg
+[build-badge]: https://img.shields.io/travis/retextjs/retext-spell.svg
 
-[travis]: https://travis-ci.org/retextjs/retext-spell
+[build]: https://travis-ci.org/retextjs/retext-spell
 
-[codecov-badge]: https://img.shields.io/codecov/c/github/retextjs/retext-spell.svg
+[coverage-badge]: https://img.shields.io/codecov/c/github/retextjs/retext-spell.svg
 
-[codecov]: https://codecov.io/github/retextjs/retext-spell
+[coverage]: https://codecov.io/github/retextjs/retext-spell
+
+[downloads-badge]: https://img.shields.io/npm/dm/retext-spell.svg
+
+[downloads]: https://www.npmjs.com/package/retext-spell
+
+[chat-badge]: https://img.shields.io/badge/join%20the%20community-on%20spectrum-7b16ff.svg
+
+[chat]: https://spectrum.chat/unified/retext
 
 [npm]: https://docs.npmjs.com/cli/install
 
