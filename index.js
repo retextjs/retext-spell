@@ -25,22 +25,23 @@ function spell(options) {
   var digits = settings.ignoreDigits
   var apos = settings.normalizeApostrophes
   var personal = settings.personal
-  var config = {}
+  var config
   var loadError
 
   if (typeof load !== 'function') {
     throw new Error('Expected `Object`, got `' + load + '`')
   }
 
-  config.ignoreLiteral =
-    literal === null || literal === undefined ? true : literal
-  config.ignoreDigits = digits === null || digits === undefined ? true : digits
-  config.normalizeApostrophes =
-    apos === null || apos === undefined ? true : apos
-  config.ignore = settings.ignore
-  config.max = settings.max || max
-  config.count = 0
-  config.cache = {}
+  config = {
+    ignoreLiteral: literal === null || literal === undefined ? true : literal,
+    ignoreDigits: digits === null || digits === undefined ? true : digits,
+    normalizeApostrophes: apos === null || apos === undefined ? true : apos,
+    ignore: settings.ignore,
+    max: settings.max || max,
+    count: 0,
+    cache: {},
+    checker: null
+  }
 
   load(construct)
 
@@ -60,8 +61,8 @@ function spell(options) {
   }
 
   // Callback invoked when a `dictionary` is loaded (possibly erroneous) or
-  // when `load`ing failed.  Flushes the queue when available, and sets the
-  // results on the parent scope.
+  // when `load`ing failed.
+  // Flushes the queue when available, and sets the results on the parent scope.
   function construct(err, dictionary) {
     var length = queue.length
     var index = -1
@@ -123,8 +124,12 @@ function all(tree, file, config) {
       return
     }
 
+    // Check the whole word.
     correct = checker.correct(word)
 
+    // If the whole word is not correct, check all its parts.
+    // This makes sure that, if `alpha` and `bravo` are correct, `alpha-bravo`
+    // is also seenn as correct.
     if (!correct && children.length > 1) {
       correct = true
       length = children.length
@@ -144,6 +149,8 @@ function all(tree, file, config) {
     }
 
     if (!correct) {
+      // Suggestions are very slow, so cache them (spelling mistakes other than
+      // typos often occur multiple times).
       if (own.call(cache, word)) {
         reason = cache[word]
       } else {
