@@ -1,16 +1,24 @@
-# retext-spell [![Build][build-badge]][build] [![Coverage][coverage-badge]][coverage] [![Downloads][downloads-badge]][downloads] [![Chat][chat-badge]][chat]
+# retext-spell
 
-Check spelling with [**retext**][retext], based on [`nspell`][nspell].
+[![Build][build-badge]][build]
+[![Coverage][coverage-badge]][coverage]
+[![Downloads][downloads-badge]][downloads]
+[![Size][size-badge]][size]
+[![Sponsors][sponsors-badge]][collective]
+[![Backers][backers-badge]][collective]
+[![Chat][chat-badge]][chat]
 
-## Installation
+[**retext**][retext] plugin to check spelling (with [`nspell`][nspell]).
+
+## Install
 
 [npm][]:
 
-```bash
+```sh
 npm install retext-spell
 ```
 
-## Usage
+## Use
 
 ```js
 var retext = require('retext')
@@ -38,28 +46,24 @@ Yields:
 
 ### `retext().use(spell, options)`
 
-> **retext-spell** is async; use [`process`][process], not `processSync`.
+> `retext-spell` is async; use [`process`][process], not `processSync`.
 
-Adds warnings for misspelt words to processed [virtual
-file][vfile]s.
+Check spelling (with [`nspell`][nspell]).
 
-##### Signatures
+###### Signatures
 
 *   `retext().use(spell, dictionary)`
 *   `retext().use(spell, options)`
 
-##### `options`
-
-Optional object.
-
 ###### `options.dictionary`
 
-A dictionary ([`Function`][dictionaries]).  Result of requiring one of the
-dictionaries in [`wooorm/dictionaries`][dictionaries].
+A dictionary ([`Function`][dictionaries]).
+Result of requiring one of the dictionaries in
+[`wooorm/dictionaries`][dictionaries].
 
 ###### `options.personal`
 
-[Personal][] dictionary (`string` or a `Buffer` in `utf8`, optional).
+[Personal][] dictionary (`string` or a `Buffer` in UTF-8, optional).
 
 ###### `options.ignore`
 
@@ -76,16 +80,17 @@ Whether to ignore “words” that contain only digits, such as `123456`
 
 ###### `options.normalizeApostrophes`
 
-Deal with apostrophes (`boolean?`, default `true`).  Whether to swap smart
-apostrophes (`’`) with straight apostrophes (`'`) before checking spelling.
-Most dictionaries do recognise straight apostrophes (`isn't`), but not smart
-apostrophes (`isn’t`).
+Deal with apostrophes (`boolean?`, default `true`).
+Whether to swap smart apostrophes (`’`) with straight apostrophes (`'`) before
+checking spelling.
+Dictionaries typically support this, but this option can be used if not.
 
 ###### `options.max`
 
-Number of unique words to suggest for (`number?`, default `30`).  By default,
-up to thirty words are suggested for.  Further misspellings are still warned
-about, but without suggestions
+Number of unique words to suggest for (`number?`, default `30`).
+By default, up to thirty words are suggested for.
+Further misspellings are still warned about, but without suggestions.
+Increasing this number significantly impacts performance.
 
 ## Related
 
@@ -106,11 +111,13 @@ about, but without suggestions
 
 ## Contribute
 
-See [`contributing.md` in `retextjs/retext`][contributing] for ways to get
-started.
+See [`contributing.md`][contributing] in [`retextjs/.github`][health] for ways
+to get started.
+See [`support.md`][support] for ways to get help.
 
-This organisation has a [Code of Conduct][coc].  By interacting with this
-repository, organisation, or community you agree to abide by its terms.
+This project has a [Code of Conduct][coc].
+By interacting with this repository, organisation, or community you agree to
+abide by its terms.
 
 ## License
 
@@ -130,11 +137,29 @@ repository, organisation, or community you agree to abide by its terms.
 
 [downloads]: https://www.npmjs.com/package/retext-spell
 
+[size-badge]: https://img.shields.io/bundlephobia/minzip/retext-spell.svg
+
+[size]: https://bundlephobia.com/result?p=retext-spell
+
+[sponsors-badge]: https://opencollective.com/unified/sponsors/badge.svg
+
+[backers-badge]: https://opencollective.com/unified/backers/badge.svg
+
+[collective]: https://opencollective.com/unified
+
 [chat-badge]: https://img.shields.io/badge/join%20the%20community-on%20spectrum-7b16ff.svg
 
 [chat]: https://spectrum.chat/unified/retext
 
 [npm]: https://docs.npmjs.com/cli/install
+
+[health]: https://github.com/retextjs/.github
+
+[contributing]: https://github.com/retextjs/.github/blob/master/contributing.md
+
+[support]: https://github.com/retextjs/.github/blob/master/support.md
+
+[coc]: https://github.com/retextjs/.github/blob/master/code-of-conduct.md
 
 [license]: license
 
@@ -144,8 +169,6 @@ repository, organisation, or community you agree to abide by its terms.
 
 [process]: https://github.com/unifiedjs/unified#processorprocessfilevalue-done
 
-[vfile]: https://github.com/vfile/vfile
-
 [dictionaries]: https://github.com/wooorm/dictionaries
 
 [nspell]: https://github.com/wooorm/nspell
@@ -153,7 +176,3 @@ repository, organisation, or community you agree to abide by its terms.
 [literal]: https://github.com/syntax-tree/nlcst-is-literal#isliteralparent-index
 
 [personal]: https://github.com/wooorm/nspell#personal-dictionary-documents
-
-[contributing]: https://github.com/retextjs/retext/blob/master/contributing.md
-
-[coc]: https://github.com/retextjs/retext/blob/master/code-of-conduct.md
