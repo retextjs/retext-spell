@@ -1,16 +1,18 @@
 {
   "name": "retext-spell",
   "version": "2.4.0",
-  "description": "Spelling checker for retext",
+  "description": "retext plugin to check spelling",
   "license": "MIT",
   "keywords": [
+    "unified",
+    "retext",
+    "plugin",
     "spelling",
     "correct",
     "checker",
     "spell",
     "fix",
-    "autocorrect",
-    "retext"
+    "autocorrect"
   ],
   "repository": "retextjs/retext-spell",
   "bugs": "https://github.com/retextjs/retext-spell/issues",
