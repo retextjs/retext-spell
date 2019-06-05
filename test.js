@@ -171,7 +171,7 @@ test('should ignore digits', function(t) {
 })
 
 test('should treat smart apostrophes as straight apostrophes', function(t) {
-  t.plan(4)
+  t.plan(3)
 
   retext()
     .use(spell, enGB)
@@ -185,14 +185,20 @@ test('should treat smart apostrophes as straight apostrophes', function(t) {
       check(t, file, [])
     })
 
-  retext()
-    .use(spell, {
-      dictionary: enGB,
-      normalizeApostrophes: false
-    })
-    .process('It doesn’t work', function(_, file) {
-      check(t, file, ['1:4-1:11: `doesn’t` is misspelt'])
-    })
+  // Most affix files specify this functionality (with `ICONV ’ '`).
+  // This didn’t work in nspell, but was fixed:
+  // see: <https://github.com/wooorm/nspell/commit/a55923e>.
+  // We keep `normalizeApostrophes` here for legacy reasons and for use with
+  // dictionaries that don’t support it.
+  //
+  // retext()
+  //   .use(spell, {
+  //     dictionary: enGB,
+  //     normalizeApostrophes: false
+  //   })
+  //   .process('It doesn’t work', function(_, file) {
+  //     check(t, file, ['1:4-1:11: `doesn’t` is misspelt'])
+  //   })
 
   retext()
     .use(spell, {
