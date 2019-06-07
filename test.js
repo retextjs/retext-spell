@@ -49,7 +49,36 @@ test('should fail load errors on the VFile', function(t) {
 })
 
 test('should warn for misspelt words', function(t) {
-  t.plan(3)
+  t.plan(4)
+
+  retext()
+    .use(spell, enGB)
+    .process('color', function(_, file) {
+      t.deepEqual(
+        file.messages,
+        [
+          {
+            message:
+              '`color` is misspelt; did you mean `colon`, `colour`, `Colo`?',
+            name: '1:1-1:6',
+            reason:
+              '`color` is misspelt; did you mean `colon`, `colour`, `Colo`?',
+            line: 1,
+            column: 1,
+            location: {
+              start: {line: 1, column: 1, offset: 0},
+              end: {line: 1, column: 6, offset: 5}
+            },
+            source: 'retext-spell',
+            ruleId: 'color',
+            fatal: false,
+            actual: 'color',
+            expected: ['colon', 'colour', 'Colo']
+          }
+        ],
+        'should emit messages'
+      )
+    })
 
   retext()
     .use(spell, enGB)

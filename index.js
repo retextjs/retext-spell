@@ -129,7 +129,7 @@ function all(tree, file, config) {
 
     // If the whole word is not correct, check all its parts.
     // This makes sure that, if `alpha` and `bravo` are correct, `alpha-bravo`
-    // is also seenn as correct.
+    // is also seen as correct.
     if (!correct && children.length > 1) {
       correct = true
       length = children.length
@@ -157,13 +157,11 @@ function all(tree, file, config) {
         reason = quote(word, '`') + ' is misspelt'
 
         if (config.count === config.max) {
-          message = file.message(
+          file.message(
             'Too many misspellings; no further spell suggestions are given',
             node,
-            'overflow'
+            [source, 'overflow'].join(':')
           )
-
-          message.source = source
         }
 
         config.count++
@@ -181,10 +179,13 @@ function all(tree, file, config) {
         cache[word] = reason
       }
 
-      message = file.message(reason, node, source)
-      message.source = source
+      message = file.message(
+        reason,
+        node,
+        [source, word.toLowerCase().replace(/\W+/, '-')].join(':')
+      )
       message.actual = word
-      message.expected = suggestions
+      message.expected = suggestions || []
     }
   }
 
