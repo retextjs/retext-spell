@@ -36,8 +36,8 @@ retext()
 Yields:
 
 ```txt
-   1:6-1:12  warning  `useles` is misspelt; did you mean `useless`?      retext-spell  retext-spell
-  1:13-1:22  warning  `documeant` is misspelt; did you mean `document`?  retext-spell  retext-spell
+   1:6-1:12  warning  `useles` is misspelt; did you mean `useless`?      useles     retext-spell
+  1:13-1:22  warning  `documeant` is misspelt; did you mean `document`?  documeant  retext-spell
 
 ⚠ 2 warnings
 ```
@@ -91,6 +91,27 @@ Number of unique words to suggest for (`number?`, default `30`).
 By default, up to thirty words are suggested for.
 Further misspellings are still warned about, but without suggestions.
 Increasing this number significantly impacts performance.
+
+### Messages
+
+Each message is emitted as a [`VFileMessage`][message] on `file`, with the
+following fields:
+
+###### `message.source`
+
+Name of this plugin (`'retext-spell'`).
+
+###### `message.ruleId`
+
+Normalized not ok word (`string`, such as `'useles'`).
+
+###### `message.actual`
+
+Current not ok word (`string`, such as `'Useles'`).
+
+###### `message.expected`
+
+List of suggestions of words to use (`Array.<string>`, such as `['Useless']`).
 
 ## Related
 
@@ -167,12 +188,14 @@ abide by its terms.
 
 [retext]: https://github.com/retextjs/retext
 
+[message]: https://github.com/vfile/vfile-message
+
+[literal]: https://github.com/syntax-tree/nlcst-is-literal#isliteralparent-index
+
 [process]: https://github.com/unifiedjs/unified#processorprocessfilevalue-done
 
 [dictionaries]: https://github.com/wooorm/dictionaries
 
 [nspell]: https://github.com/wooorm/nspell
-
-[literal]: https://github.com/syntax-tree/nlcst-is-literal#isliteralparent-index
 
 [personal]: https://github.com/wooorm/nspell#personal-dictionary-documents
