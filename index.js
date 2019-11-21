@@ -4,7 +4,7 @@ var nspell = require('nspell')
 var visit = require('unist-util-visit')
 var toString = require('nlcst-to-string')
 var isLiteral = require('nlcst-is-literal')
-var includes = require('lodash.includes')
+var includes = require('lodash/includes')
 var quote = require('quotation')
 
 module.exports = spell

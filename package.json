@@ -27,7 +27,7 @@
     "index.js"
   ],
   "dependencies": {
-    "lodash.includes": "^4.2.0",
+    "lodash": ">= 4.17.5",
     "nlcst-is-literal": "^1.0.0",
     "nlcst-to-string": "^2.0.0",
     "nspell": "^2.0.0",
