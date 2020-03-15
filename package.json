@@ -32,7 +32,6 @@
     "index.js"
   ],
   "dependencies": {
-    "lodash.includes": "^4.2.0",
     "nlcst-is-literal": "^1.0.0",
     "nlcst-to-string": "^2.0.0",
     "nspell": "^2.0.0",
@@ -80,6 +79,7 @@
     "esnext": false,
     "rules": {
       "unicorn/string-content": "off",
+      "unicorn/prefer-includes": "off",
       "unicorn/prefer-type-error": "off",
       "unicorn/no-new-buffer": "off"
     },

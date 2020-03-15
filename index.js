@@ -4,7 +4,6 @@ var nspell = require('nspell')
 var visit = require('unist-util-visit')
 var toString = require('nlcst-to-string')
 var isLiteral = require('nlcst-is-literal')
-var includes = require('lodash.includes')
 var quote = require('quotation')
 
 module.exports = spell
@@ -36,7 +35,7 @@ function spell(options) {
     ignoreLiteral: literal === null || literal === undefined ? true : literal,
     ignoreDigits: digits === null || digits === undefined ? true : digits,
     normalizeApostrophes: apos === null || apos === undefined ? true : apos,
-    ignore: settings.ignore,
+    ignore: settings.ignore || [],
     max: settings.max || max,
     count: 0,
     cache: {},
@@ -191,6 +190,8 @@ function all(tree, file, config) {
 
   // Check if a word is irrelevant.
   function irrelevant(word) {
-    return includes(ignore, word) || (ignoreDigits && digitsOnly.test(word))
+    return (
+      ignore.indexOf(word) !== -1 || (ignoreDigits && digitsOnly.test(word))
+    )
   }
 }
