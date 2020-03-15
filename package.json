@@ -5,6 +5,7 @@
   "license": "MIT",
   "keywords": [
     "unified",
+    "retext-plugin",
     "retext",
     "plugin",
     "spelling",
