@@ -7,12 +7,10 @@ var enGb = require('dictionary-en-gb')
 var retext = require('retext')
 var spell = require('.')
 
-test('should throw when without `options`', function(t) {
+test('should throw when without `options`', function (t) {
   t.throws(
-    function() {
-      retext()
-        .use(spell)
-        .freeze()
+    function () {
+      retext().use(spell).freeze()
     },
     /^Error: Expected `Object`, got `undefined`$/,
     'should throw'
@@ -21,18 +19,18 @@ test('should throw when without `options`', function(t) {
   t.end()
 })
 
-test('should fail load errors on the VFile', function(t) {
+test('should fail load errors on the VFile', function (t) {
   var processor = retext().use(spell, failingLoader)
 
   t.plan(3)
 
-  processor.process('', function(err) {
+  processor.process('', function (err) {
     var failed
 
     t.equal(err.message, 'load error')
 
     // Coverage: future files can fail immediatly.
-    processor.process('', function(err) {
+    processor.process('', function (err) {
       t.equal(err.message, 'load error')
       failed = true
     })
@@ -42,20 +40,20 @@ test('should fail load errors on the VFile', function(t) {
 
   // Fixture for a loader which fails.
   function failingLoader(callback) {
-    setImmediate(function() {
+    setImmediate(function () {
       callback(new Error('load error'))
     })
   }
 })
 
-test('should warn for misspelt words', function(t) {
+test('should warn for misspelt words', function (t) {
   t.plan(4)
 
   retext()
     .use(spell, enGb)
-    .process('color', function(_, file) {
+    .process('color', function (_, file) {
       t.deepEqual(
-        file.messages,
+        JSON.parse(JSON.stringify(file.messages)),
         [
           {
             message:
@@ -82,13 +80,13 @@ test('should warn for misspelt words', function(t) {
 
   retext()
     .use(spell, enGb)
-    .process('color', function(_, file) {
+    .process('color', function (_, file) {
       check(t, file, ['1:1-1:6: `color` is misspelt'])
     })
 
   retext()
     .use(spell, en)
-    .process('colour and utilise', function(_, file) {
+    .process('colour and utilise', function (_, file) {
       check(t, file, [
         '1:1-1:7: `colour` is misspelt',
         '1:12-1:19: `utilise` is misspelt'
@@ -97,7 +95,7 @@ test('should warn for misspelt words', function(t) {
 
   retext()
     .use(spell, en)
-    .process('colour and colour and colour', function(_, file) {
+    .process('colour and colour and colour', function (_, file) {
       check(t, file, [
         '1:1-1:7: `colour` is misspelt',
         '1:12-1:18: `colour` is misspelt',
@@ -106,27 +104,27 @@ test('should warn for misspelt words', function(t) {
     })
 })
 
-test('should warn for invalid words (coverage)', function(t) {
+test('should warn for invalid words (coverage)', function (t) {
   var english = retext().use(spell, enGb)
 
   t.plan(2)
 
-  english.process('color', function(_, file) {
+  english.process('color', function (_, file) {
     check(t, file, ['1:1-1:6: `color` is misspelt'])
 
     // Coverage: future files can start faster.
-    english.process('colour', function(_, file) {
+    english.process('colour', function (_, file) {
       check(t, file, [])
     })
   })
 })
 
-test('should support `max`, for maximum suggestions', function(t) {
+test('should support `max`, for maximum suggestions', function (t) {
   t.plan(1)
 
   retext()
     .use(spell, {dictionary: enGb, max: 1})
-    .process('Some useles mispelt documeant', function(_, file) {
+    .process('Some useles mispelt documeant', function (_, file) {
       check(t, file, [
         '1:6-1:12: `useles` is misspelt',
         '1:13-1:20: Too many misspellings',
@@ -136,47 +134,47 @@ test('should support `max`, for maximum suggestions', function(t) {
     })
 })
 
-test('should ignore literal words', function(t) {
+test('should ignore literal words', function (t) {
   t.plan(1)
 
   retext()
     .use(spell, enGb)
-    .process('“color”', function(_, file) {
+    .process('“color”', function (_, file) {
       check(t, file, [])
     })
 })
 
-test('...unless `ignoreLiteral` is false', function(t) {
+test('...unless `ignoreLiteral` is false', function (t) {
   t.plan(1)
 
   retext()
     .use(spell, {dictionary: enGb, ignoreLiteral: false})
-    .process('“color”', function(_, file) {
+    .process('“color”', function (_, file) {
       check(t, file, ['1:2-1:7: `color` is misspelt'])
     })
 })
 
-test('should warn for misspelt hyphenated words', function(t) {
+test('should warn for misspelt hyphenated words', function (t) {
   t.plan(1)
 
   retext()
     .use(spell, enGb)
-    .process('wrongely-spelled-word', function(_, file) {
+    .process('wrongely-spelled-word', function (_, file) {
       check(t, file, ['1:1-1:22: `wrongely-spelled-word` is misspelt'])
     })
 })
 
-test('should not warn for correctly spelled hyphenated words', function(t) {
+test('should not warn for correctly spelled hyphenated words', function (t) {
   t.plan(1)
 
   retext()
     .use(spell, enGb)
-    .process('random-hyphenated-word', function(_, file) {
+    .process('random-hyphenated-word', function (_, file) {
       check(t, file, [])
     })
 })
 
-test('should not warn for ignored words in hyphenated words', function(t) {
+test('should not warn for ignored words in hyphenated words', function (t) {
   t.plan(1)
 
   retext()
@@ -184,33 +182,33 @@ test('should not warn for ignored words in hyphenated words', function(t) {
       dictionary: enGb,
       ignore: ['wrongely']
     })
-    .process('wrongely-spelled-word', function(_, file) {
+    .process('wrongely-spelled-word', function (_, file) {
       check(t, file, [])
     })
 })
 
-test('should ignore digits', function(t) {
+test('should ignore digits', function (t) {
   t.plan(1)
 
   retext()
     .use(spell, enGb)
-    .process('123456', function(_, file) {
+    .process('123456', function (_, file) {
       check(t, file, [])
     })
 })
 
-test('should treat smart apostrophes as straight apostrophes', function(t) {
+test('should treat smart apostrophes as straight apostrophes', function (t) {
   t.plan(3)
 
   retext()
     .use(spell, enGb)
-    .process('It doesn’t work', function(_, file) {
+    .process('It doesn’t work', function (_, file) {
       check(t, file, [])
     })
 
   retext()
     .use(spell, enGb)
-    .process("It doesn't work.", function(_, file) {
+    .process("It doesn't work.", function (_, file) {
       check(t, file, [])
     })
 
@@ -234,62 +232,62 @@ test('should treat smart apostrophes as straight apostrophes', function(t) {
       dictionary: enGb,
       normalizeApostrophes: false
     })
-    .process("It doesn't work", function(_, file) {
+    .process("It doesn't work", function (_, file) {
       check(t, file, [])
     })
 })
 
-test('...unless `ignoreDigits` is false', function(t) {
+test('...unless `ignoreDigits` is false', function (t) {
   t.plan(1)
 
   retext()
     .use(spell, {dictionary: enGb, ignoreDigits: false})
-    .process('123456', function(_, file) {
+    .process('123456', function (_, file) {
       check(t, file, ['1:1-1:7: `123456` is misspelt'])
     })
 })
 
-test('should ignore digits with decimals', function(t) {
+test('should ignore digits with decimals', function (t) {
   t.plan(1)
 
   retext()
     .use(spell, enGb)
-    .process('3.14', function(_, file) {
+    .process('3.14', function (_, file) {
       check(t, file, [])
     })
 })
 
-test('...unless `ignoreDigits` is false', function(t) {
+test('...unless `ignoreDigits` is false', function (t) {
   t.plan(1)
 
   retext()
     .use(spell, {dictionary: enGb, ignoreDigits: false})
-    .process('3.15', function(_, file) {
+    .process('3.15', function (_, file) {
       check(t, file, ['1:1-1:5: `3.15` is misspelt'])
     })
 })
 
-test('should not ignore words that include digits', function(t) {
+test('should not ignore words that include digits', function (t) {
   t.plan(1)
 
   retext()
     .use(spell, enGb)
-    .process('768x1024', function(_, file) {
+    .process('768x1024', function (_, file) {
       check(t, file, ['1:1-1:9: `768x1024` is misspelt'])
     })
 })
 
-test('should `ignore`', function(t) {
+test('should `ignore`', function (t) {
   t.plan(1)
 
   retext()
     .use(spell, {dictionary: enGb, ignore: ['color']})
-    .process('color coloor', function(_, file) {
+    .process('color coloor', function (_, file) {
       check(t, file, ['1:7-1:13: `coloor` is misspelt'])
     })
 })
 
-test('should accept `personal`', function(t) {
+test('should accept `personal`', function (t) {
   // Forbid UK spelling, mark US spelling as correct.
   var personal = '*colour\ncolor\n'
 
@@ -297,7 +295,7 @@ test('should accept `personal`', function(t) {
 
   retext()
     .use(spell, {dictionary: enGb, personal: personal})
-    .process('color coloor colour', function(_, file) {
+    .process('color coloor colour', function (_, file) {
       check(t, file, [
         '1:7-1:13: `coloor` is misspelt',
         '1:14-1:20: `colour` is misspelt'
@@ -306,7 +304,7 @@ test('should accept `personal`', function(t) {
 
   retext()
     .use(spell, {dictionary: enGb, personal: Buffer.from(personal)})
-    .process('color coloor colour', function(_, file) {
+    .process('color coloor colour', function (_, file) {
       check(t, file, [
         '1:7-1:13: `coloor` is misspelt',
         '1:14-1:20: `colour` is misspelt'
@@ -315,7 +313,7 @@ test('should accept `personal`', function(t) {
 })
 
 function check(t, file, expected) {
-  t.doesNotThrow(function() {
+  t.doesNotThrow(function () {
     var messages = file.messages
     var length = Math.max(expected.length, messages.length)
     var index = -1
