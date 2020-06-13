@@ -47,6 +47,7 @@
     "remark-cli": "^8.0.0",
     "remark-preset-wooorm": "^7.0.0",
     "retext": "^7.0.0",
+    "retext-emoji": "^7.0.0",
     "tape": "^5.0.0",
     "tinyify": "^2.0.0",
     "xo": "^0.32.0"

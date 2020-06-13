@@ -28,7 +28,7 @@ var report = require('vfile-reporter')
 
 retext()
   .use(spell, dictionary)
-  .process('Some useles documeant.', function(err, file) {
+  .process('Some useles documeant.', function (err, file) {
     console.error(report(err || file))
   })
 ```
@@ -125,6 +125,8 @@ List of suggestions of words to use (`Array.<string>`, such as `['Useless']`).
     — Check for redundant acronyms (`ATM machine`)
 *   [`retext-repeated-words`](https://github.com/retextjs/retext-repeated-words)
     — Check `for for` repeated words
+*   [`retext-emoji`](https://github.com/retextjs/retext-emoji)
+    — Classify emoji, gemoji, emoticons as syntax
 *   [`retext-syntax-mentions`](https://github.com/retextjs/retext-syntax-mentions)
     — Classify [**@mentions**](https://github.com/blog/821) as syntax
 *   [`retext-syntax-urls`](https://github.com/retextjs/retext-syntax-urls)

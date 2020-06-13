@@ -5,6 +5,7 @@ var test = require('tape')
 var en = require('dictionary-en')
 var enGb = require('dictionary-en-gb')
 var retext = require('retext')
+var emoji = require('retext-emoji')
 var spell = require('.')
 
 test('should throw when without `options`', function (t) {
@@ -309,6 +310,23 @@ test('should accept `personal`', function (t) {
         '1:7-1:13: `coloor` is misspelt',
         '1:14-1:20: `colour` is misspelt'
       ])
+    })
+})
+
+test('should integrate w/ `retext-emoji`', function (t) {
+  t.plan(2)
+
+  retext()
+    .use(spell, enGb)
+    .process('Pages ⚡️', function (_, file) {
+      check(t, file, ['1:8-1:9: `️` is misspelt; did you mean'])
+    })
+
+  retext()
+    .use(emoji)
+    .use(spell, enGb)
+    .process('Pages ⚡️', function (_, file) {
+      check(t, file, [])
     })
 })
 
