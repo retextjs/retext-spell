@@ -53,7 +53,7 @@
     "xo": "^0.32.0"
   },
   "scripts": {
-    "format": "remark . -qfo && prettier --write \"**/*.js\" && xo --fix",
+    "format": "remark . -qfo && prettier . --write && xo --fix",
     "build-bundle": "browserify . -s retextSpell > retext-spell.js",
     "build-mangle": "browserify . -s retextSpell -p tinyify > retext-spell.min.js",
     "build": "npm run build-bundle && npm run build-mangle",
