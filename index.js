@@ -62,11 +62,11 @@ function spell(options) {
   // Callback invoked when a `dictionary` is loaded (possibly erroneous) or
   // when `load`ing failed.
   // Flushes the queue when available, and sets the results on the parent scope.
-  function construct(err, dictionary) {
+  function construct(error, dictionary) {
     var length = queue.length
     var index = -1
 
-    loadError = err
+    loadError = error
 
     if (dictionary) {
       config.checker = nspell(dictionary)
@@ -77,11 +77,11 @@ function spell(options) {
     }
 
     while (++index < length) {
-      if (!err) {
+      if (!error) {
         all.apply(null, queue[index])
       }
 
-      queue[index][3](err)
+      queue[index][3](error)
     }
 
     queue = []

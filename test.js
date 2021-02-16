@@ -25,14 +25,14 @@ test('should fail load errors on the VFile', function (t) {
 
   t.plan(3)
 
-  processor.process('', function (err) {
+  processor.process('', function (error) {
     var failed
 
-    t.equal(err.message, 'load error')
+    t.equal(error.message, 'load error')
 
     // Coverage: future files can fail immediatly.
-    processor.process('', function (err) {
-      t.equal(err.message, 'load error')
+    processor.process('', function (error) {
+      t.equal(error.message, 'load error')
       failed = true
     })
 
