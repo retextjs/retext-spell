@@ -148,9 +148,9 @@ abide by its terms.
 
 <!-- Definitions -->
 
-[build-badge]: https://img.shields.io/travis/retextjs/retext-spell.svg
+[build-badge]: https://github.com/retextjs/retext-spell/workflows/main/badge.svg
 
-[build]: https://travis-ci.org/retextjs/retext-spell
+[build]: https://github.com/retextjs/retext-spell/actions
 
 [coverage-badge]: https://img.shields.io/codecov/c/github/retextjs/retext-spell.svg
 
