@@ -151,7 +151,9 @@ function all(tree, file, config) {
       // Suggestions are very slow, so cache them (spelling mistakes other than
       // typos often occur multiple times).
       if (own.call(cache, word)) {
-        reason = cache[word]
+        var cachedSuggestionData = cache[word]
+        reason = cachedSuggestionData.reason
+        suggestions = cachedSuggestionData.suggestions
       } else {
         reason = quote(word, '`') + ' is misspelt'
 
@@ -171,11 +173,10 @@ function all(tree, file, config) {
           if (suggestions.length !== 0) {
             reason +=
               '; did you mean ' + quote(suggestions, '`').join(', ') + '?'
-            cache[word] = reason
           }
         }
 
-        cache[word] = reason
+        cache[word] = {reason, suggestions: suggestions || []}
       }
 
       message = file.message(
