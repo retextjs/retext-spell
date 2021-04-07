@@ -157,21 +157,6 @@ test('should cache suggestions', function (t) {
   }
 })
 
-test('should warn for invalid words (coverage)', function (t) {
-  var english = retext().use(spell, enGb)
-
-  t.plan(2)
-
-  english.process('color', function (_, file) {
-    check(t, file, ['1:1-1:6: `color` is misspelt'])
-
-    // Coverage: future files can start faster.
-    english.process('colour', function (_, file) {
-      check(t, file, [])
-    })
-  })
-})
-
 test('should support `max`, for maximum suggestions', function (t) {
   t.plan(1)
 
