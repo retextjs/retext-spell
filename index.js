@@ -148,13 +148,14 @@ function all(tree, file, config) {
     }
 
     if (!correct) {
+      reason = quote(word, '`') + ' is misspelt'
+
       // Suggestions are very slow, so cache them (spelling mistakes other than
       // typos often occur multiple times).
       if (own.call(cache, word)) {
-        reason = cache[word]
+        suggestions = cache[word]
+        reason = concatPrefixToSuggestions(reason, suggestions)
       } else {
-        reason = quote(word, '`') + ' is misspelt'
-
         if (config.count === config.max) {
           file.message(
             'Too many misspellings; no further spell suggestions are given',
@@ -169,13 +170,11 @@ function all(tree, file, config) {
           suggestions = checker.suggest(word)
 
           if (suggestions.length !== 0) {
-            reason +=
-              '; did you mean ' + quote(suggestions, '`').join(', ') + '?'
-            cache[word] = reason
+            reason = concatPrefixToSuggestions(reason, suggestions)
           }
         }
 
-        cache[word] = reason
+        cache[word] = suggestions || []
       }
 
       message = file.message(
@@ -186,6 +185,11 @@ function all(tree, file, config) {
       message.actual = word
       message.expected = suggestions || []
     }
+  }
+
+  // Concatenate the formatted suggestions to a given prefix
+  function concatPrefixToSuggestions(prefix, suggestions) {
+    return prefix + '; did you mean ' + quote(suggestions, '`').join(', ') + '?'
   }
 
   // Check if a word is irrelevant.
