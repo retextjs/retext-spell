@@ -1,8 +1,11 @@
 import assert from 'assert'
 import test from 'tape'
+// @ts-expect-error: to type.
 import en from 'dictionary-en'
+// @ts-expect-error: to type.
 import enGb from 'dictionary-en-gb'
 import {retext} from 'retext'
+// @ts-expect-error: to type.
 import emoji from 'retext-emoji'
 import retextSpell from './index.js'
 
@@ -11,7 +14,7 @@ test('should throw when without `options`', (t) => {
     () => {
       retext().use(retextSpell).freeze()
     },
-    /^TypeError: Expected `Object`, got `\[object Object]`$/,
+    /^TypeError: Expected `Object`, got `undefined`$/,
     'should throw'
   )
 
@@ -31,11 +34,11 @@ test('should fail load errors on the VFile', (t) => {
 
   t.plan(2)
 
-  processor.process('').then(t.ifErr, (error) => {
+  processor.process('').then(t.ifErr, (/** @type {Error} */ error) => {
     t.equal(error.message, 'load error')
 
     // Coverage: future files can fail immediatly.
-    processor.process('').then(t.ifErr, (error) => {
+    processor.process('').then(t.ifErr, (/** @type {Error} */ error) => {
       t.equal(error.message, 'load error')
     })
   })
@@ -366,6 +369,11 @@ test('should integrate w/ `retext-emoji`', (t) => {
     }, t.ifErr)
 })
 
+/**
+ * @param {import('tape').Test} t
+ * @param {import('vfile').VFile} file
+ * @param {string[]} expected
+ */
 function check(t, file, expected) {
   t.doesNotThrow(() => {
     const messages = file.messages

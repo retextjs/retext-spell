@@ -1,3 +1,31 @@
+/**
+ * @typedef {(onload: (error: Error|null|undefined, result?: unknown) => void) => void} Dictionary
+ *
+ * @typedef Options
+ * @property {Dictionary} dictionary
+ *   A dictionary (`Function`).
+ *   Result of importing one of the dictionaries in `wooorm/dictionaries`.
+ * @property {string|Uint8Array} [personal]
+ *   Personal dictionary (`string` or a `Buffer` in UTF-8).
+ * @property {string[]} [ignore]
+ *   List of words to ignore.
+ * @property {boolean} [ignoreLiteral=true]
+ *   Whether to ignore literal words.
+ * @property {boolean} [ignoreDigits=true]
+ *   Whether to ignore “words” that contain only digits, such as `123456`.
+ * @property {boolean} [normalizeApostrophes=true]
+ *   Deal with apostrophes.
+ *   Whether to swap smart apostrophes (`’`) with straight apostrophes (`'`)
+ *   before checking spelling.
+ *   Dictionaries typically support this, but this option can be used if not.
+ * @property {number} [max=30]
+ *   Number of unique words to suggest for.
+ *   By default, up to thirty words are suggested for.
+ *   Further misspellings are still warned about, but without suggestions.
+ *   Increasing this number significantly impacts performance.
+ */
+
+// @ts-expect-error: to type.
 import nspell from 'nspell'
 import {visit} from 'unist-util-visit'
 import {toString} from 'nlcst-to-string'
@@ -8,9 +36,24 @@ const own = {}.hasOwnProperty
 
 const source = 'retext-spell'
 
+/**
+ * Plugin to check spelling (with `nspell`).
+ *
+ * @type {import('unified').Plugin<[Options|Dictionary]>}
+ */
+// @ts-expect-error: prevent errors.
 export default function retextSpell(options = {}) {
-  const load = options.dictionary || options
+  /**
+   * @typedef {import('unist').Node} Node
+   * @typedef {import('vfile').VFile} VFile
+   */
+
+  if (typeof options === 'function') {
+    options = {dictionary: options}
+  }
+
   const {
+    dictionary,
     ignore,
     max,
     ignoreLiteral,
@@ -18,11 +61,13 @@ export default function retextSpell(options = {}) {
     normalizeApostrophes,
     personal
   } = options
+  /** @type {Array.<[Node, VFile, config, (error?: Error|null|undefined) => void]>} */
   const queue = []
+  /** @type {Error|null|undefined} */
   let loadError
 
-  if (typeof load !== 'function') {
-    throw new TypeError('Expected `Object`, got `' + load + '`')
+  if (typeof dictionary !== 'function') {
+    throw new TypeError('Expected `Object`, got `' + dictionary + '`')
   }
 
   const config = {
@@ -46,7 +91,7 @@ export default function retextSpell(options = {}) {
   // Callback called when a `dictionary` is loaded (possibly erroneous) or
   // when `load`ing failed.
   // Flushes the queue when available, and sets the results on the parent scope.
-  load((error, dictionary) => {
+  dictionary((error, dictionary) => {
     let index = -1
 
     loadError = error
@@ -55,13 +100,17 @@ export default function retextSpell(options = {}) {
       config.checker = nspell(dictionary)
 
       if (personal) {
+        // @ts-expect-error: hush.
         config.checker.personal(personal)
       }
     }
 
     while (++index < queue.length) {
+      const parameters = queue[index].slice(0, 3)
+
       if (!error) {
-        all(...queue[index])
+        // @ts-expect-error: fine.
+        all(...parameters)
       }
 
       queue[index][3](error)
@@ -84,21 +133,46 @@ export default function retextSpell(options = {}) {
   }
 }
 
-// Check a file for spelling mistakes.
+/**
+ * Check a file for spelling mistakes.
+ *
+ * @param {import('unist').Node} tree
+ * @param {import('vfile').VFile} file
+ * @param {object} config
+ * @param {string[]} config.ignore
+ * @param {boolean} config.ignoreLiteral
+ * @param {boolean} config.ignoreDigits
+ * @param {boolean} config.normalizeApostrophes
+ * @param {any} config.checker
+ * @param {Record<string, string[]>} config.cache
+ * @param {number} config.count
+ * @param {number} config.max
+ */
 function all(tree, file, config) {
+  /**
+   * @typedef {import('unist').Parent} Parent
+   * @typedef {import('unist').Literal<string>} Literal
+   */
+
   const {
     ignore,
     ignoreLiteral,
     ignoreDigits,
     normalizeApostrophes,
+    // To do: nspell.
+    // type-coverage:ignore-next-line
     checker,
     cache
   } = config
 
-  visit(tree, 'WordNode', (node, position, parent) => {
+  visit(tree, 'WordNode', (/** @type {Parent} */ node, position, parent) => {
     const children = node.children
 
-    if (ignoreLiteral && isLiteral(parent, position)) {
+    if (
+      !parent ||
+      position === null ||
+      (ignoreLiteral && isLiteral(parent, position))
+    ) {
       return
     }
 
@@ -113,6 +187,8 @@ function all(tree, file, config) {
     }
 
     // Check the whole word.
+    /** @type {boolean} */
+    // type-coverage:ignore-next-line
     let correct = checker.correct(actual)
 
     // If the whole word is not correct, check all its parts.
@@ -124,12 +200,14 @@ function all(tree, file, config) {
       correct = true
 
       while (++index < children.length) {
-        const child = children[index]
+        const child = /** @type {Literal} */ (children[index])
 
         if (child.type !== 'TextNode' || irrelevant(child.value)) {
           continue
         }
 
+        // To do: nspell.
+        // type-coverage:ignore-next-line
         if (!checker.correct(child.value)) {
           correct = false
         }
@@ -138,6 +216,7 @@ function all(tree, file, config) {
 
     if (!correct) {
       let reason = quotation(actual, '`') + ' is misspelt'
+      /** @type {string[]|undefined} */
       let expected
 
       // Suggestions are very slow, so cache them (spelling mistakes other than
@@ -157,9 +236,13 @@ function all(tree, file, config) {
         config.count++
 
         if (config.count < config.max) {
+          // To do: nspell.
+          // type-coverage:ignore-next-line
           expected = checker.suggest(actual)
 
+          // @ts-expect-error: hush.
           if (expected.length > 0) {
+            // @ts-expect-error: hush.
             reason = concatPrefixToSuggestions(reason, expected)
           }
         }
@@ -178,14 +261,25 @@ function all(tree, file, config) {
     }
   })
 
-  // Concatenate the formatted suggestions to a given prefix
+  /**
+   * Concatenate the formatted suggestions to a given prefix
+   *
+   * @param {string} prefix
+   * @param {Array.<string>} suggestions
+   * @returns {string}
+   */
   function concatPrefixToSuggestions(prefix, suggestions) {
     return (
       prefix + '; did you mean ' + quotation(suggestions, '`').join(', ') + '?'
     )
   }
 
-  // Check if a word is irrelevant.
+  /**
+   * Check if a word is irrelevant.
+   *
+   * @param {string} word
+   * @returns {boolean}
+   */
   function irrelevant(word) {
     return ignore.includes(word) || (ignoreDigits && /^\d+$/.test(word))
   }
