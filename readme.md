@@ -12,6 +12,9 @@
 
 ## Install
 
+This package is [ESM only](https://gist.github.com/sindresorhus/a39789f98801d908bbc7ff3ecc99d99c):
+Node 12+ is needed to use it and it must be `import`ed instead of `require`d.
+
 [npm][]:
 
 ```sh
@@ -21,15 +24,16 @@ npm install retext-spell
 ## Use
 
 ```js
-var retext = require('retext')
-var spell = require('retext-spell')
-var dictionary = require('dictionary-en-gb')
-var report = require('vfile-reporter')
+import {reporter} from 'vfile-reporter'
+import {retext} from 'retext'
+import retextSpell from 'retext-spell'
+import dictionary from 'dictionary-en-gb'
 
 retext()
-  .use(spell, dictionary)
-  .process('Some useles documeant.', function (err, file) {
-    console.error(report(err || file))
+  .use(retextSpell, dictionary)
+  .process('Some useles documeant.')
+  .then((file) => {
+    console.error(reporter(file))
   })
 ```
 
@@ -44,7 +48,10 @@ Yields:
 
 ## API
 
-### `retext().use(spell, options)`
+This package exports no identifiers.
+The default export is `retextSpell`.
+
+### `unified().use(retextSpell, options)`
 
 > `retext-spell` is async; use [`process`][process], not `processSync`.
 
