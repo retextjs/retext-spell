@@ -2,14 +2,14 @@ import assert from 'assert'
 import test from 'tape'
 import en from 'dictionary-en'
 import enGb from 'dictionary-en-gb'
-import retext from 'retext'
+import {retext} from 'retext'
 import emoji from 'retext-emoji'
-import spell from './index.js'
+import retextSpell from './index.js'
 
 test('should throw when without `options`', function (t) {
   t.throws(
     function () {
-      retext().use(spell).freeze()
+      retext().use(retextSpell).freeze()
     },
     /^Error: Expected `Object`, got `undefined`$/,
     'should throw'
@@ -19,7 +19,7 @@ test('should throw when without `options`', function (t) {
 })
 
 test('should fail load errors on the VFile', function (t) {
-  var processor = retext().use(spell, failingLoader)
+  var processor = retext().use(retextSpell, failingLoader)
 
   t.plan(3)
 
@@ -49,25 +49,25 @@ test('should warn for misspelt words', function (t) {
   t.plan(4)
 
   retext()
-    .use(spell, enGb)
+    .use(retextSpell, enGb)
     .process('color', function (_, file) {
       t.deepEqual(
         JSON.parse(JSON.stringify(file.messages)),
         [
           {
+            name: '1:1-1:6',
             message:
               '`color` is misspelt; did you mean `colon`, `colour`, `Colo`?',
-            name: '1:1-1:6',
             reason:
               '`color` is misspelt; did you mean `colon`, `colour`, `Colo`?',
             line: 1,
             column: 1,
-            location: {
+            source: 'retext-spell',
+            ruleId: 'color',
+            position: {
               start: {line: 1, column: 1, offset: 0},
               end: {line: 1, column: 6, offset: 5}
             },
-            source: 'retext-spell',
-            ruleId: 'color',
             fatal: false,
             actual: 'color',
             expected: ['colon', 'colour', 'Colo']
@@ -78,13 +78,13 @@ test('should warn for misspelt words', function (t) {
     })
 
   retext()
-    .use(spell, enGb)
+    .use(retextSpell, enGb)
     .process('color', function (_, file) {
       check(t, file, ['1:1-1:6: `color` is misspelt'])
     })
 
   retext()
-    .use(spell, en)
+    .use(retextSpell, en)
     .process('colour and utilise', function (_, file) {
       check(t, file, [
         '1:1-1:7: `colour` is misspelt',
@@ -93,7 +93,7 @@ test('should warn for misspelt words', function (t) {
     })
 
   retext()
-    .use(spell, en)
+    .use(retextSpell, en)
     .process('colour and colour and colour', function (_, file) {
       check(t, file, [
         '1:1-1:7: `colour` is misspelt',
@@ -104,7 +104,7 @@ test('should warn for misspelt words', function (t) {
 })
 
 test('should warn for invalid words (coverage)', function (t) {
-  var english = retext().use(spell, enGb)
+  var english = retext().use(retextSpell, enGb)
 
   t.plan(2)
 
@@ -121,29 +121,29 @@ test('should warn for invalid words (coverage)', function (t) {
 test('should cache suggestions', function (t) {
   t.plan(2)
 
-  const retextSpell = retext().use(spell, enGb)
+  const processor = retext().use(retextSpell, enGb)
 
   const numberOfChecks = 2
 
   for (let i = 0; i < numberOfChecks; i += 1) {
-    retextSpell.process('color', function (_, file) {
+    processor.process('color', function (_, file) {
       t.deepEqual(
         JSON.parse(JSON.stringify(file.messages)),
         [
           {
+            name: '1:1-1:6',
             message:
               '`color` is misspelt; did you mean `colon`, `colour`, `Colo`?',
-            name: '1:1-1:6',
             reason:
               '`color` is misspelt; did you mean `colon`, `colour`, `Colo`?',
             line: 1,
             column: 1,
-            location: {
+            source: 'retext-spell',
+            ruleId: 'color',
+            position: {
               start: {line: 1, column: 1, offset: 0},
               end: {line: 1, column: 6, offset: 5}
             },
-            source: 'retext-spell',
-            ruleId: 'color',
             fatal: false,
             actual: 'color',
             expected: ['colon', 'colour', 'Colo']
@@ -159,7 +159,7 @@ test('should support `max`, for maximum suggestions', function (t) {
   t.plan(1)
 
   retext()
-    .use(spell, {dictionary: enGb, max: 1})
+    .use(retextSpell, {dictionary: enGb, max: 1})
     .process('Some useles mispelt documeant', function (_, file) {
       check(t, file, [
         '1:6-1:12: `useles` is misspelt',
@@ -174,7 +174,7 @@ test('should ignore literal words', function (t) {
   t.plan(1)
 
   retext()
-    .use(spell, enGb)
+    .use(retextSpell, enGb)
     .process('“color”', function (_, file) {
       check(t, file, [])
     })
@@ -184,7 +184,7 @@ test('...unless `ignoreLiteral` is false', function (t) {
   t.plan(1)
 
   retext()
-    .use(spell, {dictionary: enGb, ignoreLiteral: false})
+    .use(retextSpell, {dictionary: enGb, ignoreLiteral: false})
     .process('“color”', function (_, file) {
       check(t, file, ['1:2-1:7: `color` is misspelt'])
     })
@@ -194,7 +194,7 @@ test('should warn for misspelt hyphenated words', function (t) {
   t.plan(1)
 
   retext()
-    .use(spell, enGb)
+    .use(retextSpell, enGb)
     .process('wrongely-spelled-word', function (_, file) {
       check(t, file, ['1:1-1:22: `wrongely-spelled-word` is misspelt'])
     })
@@ -204,7 +204,7 @@ test('should not warn for correctly spelled hyphenated words', function (t) {
   t.plan(1)
 
   retext()
-    .use(spell, enGb)
+    .use(retextSpell, enGb)
     .process('random-hyphenated-word', function (_, file) {
       check(t, file, [])
     })
@@ -214,7 +214,7 @@ test('should not warn for ignored words in hyphenated words', function (t) {
   t.plan(1)
 
   retext()
-    .use(spell, {
+    .use(retextSpell, {
       dictionary: enGb,
       ignore: ['wrongely']
     })
@@ -227,7 +227,7 @@ test('should ignore digits', function (t) {
   t.plan(1)
 
   retext()
-    .use(spell, enGb)
+    .use(retextSpell, enGb)
     .process('123456', function (_, file) {
       check(t, file, [])
     })
@@ -237,13 +237,13 @@ test('should treat smart apostrophes as straight apostrophes', function (t) {
   t.plan(3)
 
   retext()
-    .use(spell, enGb)
+    .use(retextSpell, enGb)
     .process('It doesn’t work', function (_, file) {
       check(t, file, [])
     })
 
   retext()
-    .use(spell, enGb)
+    .use(retextSpell, enGb)
     .process("It doesn't work.", function (_, file) {
       check(t, file, [])
     })
@@ -264,7 +264,7 @@ test('should treat smart apostrophes as straight apostrophes', function (t) {
   //   })
 
   retext()
-    .use(spell, {
+    .use(retextSpell, {
       dictionary: enGb,
       normalizeApostrophes: false
     })
@@ -277,7 +277,7 @@ test('...unless `ignoreDigits` is false', function (t) {
   t.plan(1)
 
   retext()
-    .use(spell, {dictionary: enGb, ignoreDigits: false})
+    .use(retextSpell, {dictionary: enGb, ignoreDigits: false})
     .process('123456', function (_, file) {
       check(t, file, ['1:1-1:7: `123456` is misspelt'])
     })
@@ -287,7 +287,7 @@ test('should ignore digits with decimals', function (t) {
   t.plan(1)
 
   retext()
-    .use(spell, enGb)
+    .use(retextSpell, enGb)
     .process('3.14', function (_, file) {
       check(t, file, [])
     })
@@ -297,7 +297,7 @@ test('...unless `ignoreDigits` is false', function (t) {
   t.plan(1)
 
   retext()
-    .use(spell, {dictionary: enGb, ignoreDigits: false})
+    .use(retextSpell, {dictionary: enGb, ignoreDigits: false})
     .process('3.15', function (_, file) {
       check(t, file, ['1:1-1:5: `3.15` is misspelt'])
     })
@@ -307,7 +307,7 @@ test('should not ignore words that include digits', function (t) {
   t.plan(1)
 
   retext()
-    .use(spell, enGb)
+    .use(retextSpell, enGb)
     .process('768x1024', function (_, file) {
       check(t, file, ['1:1-1:9: `768x1024` is misspelt'])
     })
@@ -317,7 +317,7 @@ test('should `ignore`', function (t) {
   t.plan(1)
 
   retext()
-    .use(spell, {dictionary: enGb, ignore: ['color']})
+    .use(retextSpell, {dictionary: enGb, ignore: ['color']})
     .process('color coloor', function (_, file) {
       check(t, file, ['1:7-1:13: `coloor` is misspelt'])
     })
@@ -330,7 +330,7 @@ test('should accept `personal`', function (t) {
   t.plan(2)
 
   retext()
-    .use(spell, {dictionary: enGb, personal})
+    .use(retextSpell, {dictionary: enGb, personal})
     .process('color coloor colour', function (_, file) {
       check(t, file, [
         '1:7-1:13: `coloor` is misspelt',
@@ -339,7 +339,7 @@ test('should accept `personal`', function (t) {
     })
 
   retext()
-    .use(spell, {dictionary: enGb, personal: Buffer.from(personal)})
+    .use(retextSpell, {dictionary: enGb, personal: Buffer.from(personal)})
     .process('color coloor colour', function (_, file) {
       check(t, file, [
         '1:7-1:13: `coloor` is misspelt',
@@ -352,14 +352,14 @@ test('should integrate w/ `retext-emoji`', function (t) {
   t.plan(2)
 
   retext()
-    .use(spell, enGb)
+    .use(retextSpell, enGb)
     .process('Pages ⚡️', function (_, file) {
       check(t, file, ['1:8-1:9: `️` is misspelt; did you mean'])
     })
 
   retext()
     .use(emoji)
-    .use(spell, enGb)
+    .use(retextSpell, enGb)
     .process('Pages ⚡️', function (_, file) {
       check(t, file, [])
     })
