@@ -1,5 +1,2 @@
 coverage/
-retext-spell.js
-retext-spell.min.js
-*.json
 *.md
