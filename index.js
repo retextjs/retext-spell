@@ -1,12 +1,8 @@
-'use strict'
-
-var nspell = require('nspell')
-var visit = require('unist-util-visit')
-var toString = require('nlcst-to-string')
-var isLiteral = require('nlcst-is-literal')
-var quote = require('quotation')
-
-module.exports = spell
+import nspell from 'nspell'
+import visit from 'unist-util-visit'
+import toString from 'nlcst-to-string'
+import isLiteral from 'nlcst-is-literal'
+import quote from 'quotation'
 
 var own = {}.hasOwnProperty
 
@@ -16,7 +12,7 @@ var smart = /’/g
 var straight = "'"
 var max = 30
 
-function spell(options) {
+export default function retextSpell(options) {
   var queue = []
   var settings = options || {}
   var load = options && (options.dictionary || options)
@@ -78,7 +74,7 @@ function spell(options) {
 
     while (++index < length) {
       if (!error) {
-        all.apply(null, queue[index])
+        all(...queue[index])
       }
 
       queue[index][3](error)

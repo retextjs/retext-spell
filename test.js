@@ -1,12 +1,10 @@
-'use strict'
-
-var assert = require('assert')
-var test = require('tape')
-var en = require('dictionary-en')
-var enGb = require('dictionary-en-gb')
-var retext = require('retext')
-var emoji = require('retext-emoji')
-var spell = require('.')
+import assert from 'assert'
+import test from 'tape'
+import en from 'dictionary-en'
+import enGb from 'dictionary-en-gb'
+import retext from 'retext'
+import emoji from 'retext-emoji'
+import spell from './index.js'
 
 test('should throw when without `options`', function (t) {
   t.throws(
@@ -332,7 +330,7 @@ test('should accept `personal`', function (t) {
   t.plan(2)
 
   retext()
-    .use(spell, {dictionary: enGb, personal: personal})
+    .use(spell, {dictionary: enGb, personal})
     .process('color coloor colour', function (_, file) {
       check(t, file, [
         '1:7-1:13: `coloor` is misspelt',
