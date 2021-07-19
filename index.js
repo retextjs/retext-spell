@@ -1,8 +1,8 @@
 import nspell from 'nspell'
-import visit from 'unist-util-visit'
-import toString from 'nlcst-to-string'
-import isLiteral from 'nlcst-is-literal'
-import quote from 'quotation'
+import {visit} from 'unist-util-visit'
+import {toString} from 'nlcst-to-string'
+import {isLiteral} from 'nlcst-is-literal'
+import {quotation} from 'quotation'
 
 var own = {}.hasOwnProperty
 
@@ -144,7 +144,7 @@ function all(tree, file, config) {
     }
 
     if (!correct) {
-      reason = quote(word, '`') + ' is misspelt'
+      reason = quotation(word, '`') + ' is misspelt'
 
       // Suggestions are very slow, so cache them (spelling mistakes other than
       // typos often occur multiple times).
@@ -185,7 +185,9 @@ function all(tree, file, config) {
 
   // Concatenate the formatted suggestions to a given prefix
   function concatPrefixToSuggestions(prefix, suggestions) {
-    return prefix + '; did you mean ' + quote(suggestions, '`').join(', ') + '?'
+    return (
+      prefix + '; did you mean ' + quotation(suggestions, '`').join(', ') + '?'
+    )
   }
 
   // Check if a word is irrelevant.
