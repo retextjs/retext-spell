@@ -4,63 +4,50 @@ import {toString} from 'nlcst-to-string'
 import {isLiteral} from 'nlcst-is-literal'
 import {quotation} from 'quotation'
 
-var own = {}.hasOwnProperty
+const own = {}.hasOwnProperty
 
-var source = 'retext-spell'
-var digitsOnly = /^\d+$/
-var smart = /’/g
-var straight = "'"
-var max = 30
+const source = 'retext-spell'
 
-export default function retextSpell(options) {
-  var queue = []
-  var settings = options || {}
-  var load = options && (options.dictionary || options)
-  var literal = settings.ignoreLiteral
-  var digits = settings.ignoreDigits
-  var apos = settings.normalizeApostrophes
-  var personal = settings.personal
-  var config
-  var loadError
+export default function retextSpell(options = {}) {
+  const load = options.dictionary || options
+  const {
+    ignore,
+    max,
+    ignoreLiteral,
+    ignoreDigits,
+    normalizeApostrophes,
+    personal
+  } = options
+  const queue = []
+  let loadError
 
   if (typeof load !== 'function') {
-    throw new Error('Expected `Object`, got `' + load + '`')
+    throw new TypeError('Expected `Object`, got `' + load + '`')
   }
 
-  config = {
-    ignoreLiteral: literal === null || literal === undefined ? true : literal,
-    ignoreDigits: digits === null || digits === undefined ? true : digits,
-    normalizeApostrophes: apos === null || apos === undefined ? true : apos,
-    ignore: settings.ignore || [],
-    max: settings.max || max,
+  const config = {
+    ignoreLiteral:
+      ignoreLiteral === null || ignoreLiteral === undefined
+        ? true
+        : ignoreLiteral,
+    ignoreDigits:
+      ignoreDigits === null || ignoreDigits === undefined ? true : ignoreDigits,
+    normalizeApostrophes:
+      normalizeApostrophes === null || normalizeApostrophes === undefined
+        ? true
+        : normalizeApostrophes,
+    ignore: ignore || [],
+    max: max || 30,
     count: 0,
     cache: {},
-    checker: null
+    checker: undefined
   }
 
-  load(construct)
-
-  return transformer
-
-  // Transformer which either immediately invokes `all` when everything has
-  // finished loading or queues the arguments.
-  function transformer(tree, file, next) {
-    if (loadError) {
-      next(loadError)
-    } else if (config.checker) {
-      all(tree, file, config)
-      next()
-    } else {
-      queue.push([tree, file, config, next])
-    }
-  }
-
-  // Callback invoked when a `dictionary` is loaded (possibly erroneous) or
+  // Callback called when a `dictionary` is loaded (possibly erroneous) or
   // when `load`ing failed.
   // Flushes the queue when available, and sets the results on the parent scope.
-  function construct(error, dictionary) {
-    var length = queue.length
-    var index = -1
+  load((error, dictionary) => {
+    let index = -1
 
     loadError = error
 
@@ -72,7 +59,7 @@ export default function retextSpell(options) {
       }
     }
 
-    while (++index < length) {
+    while (++index < queue.length) {
       if (!error) {
         all(...queue[index])
       }
@@ -80,58 +67,64 @@ export default function retextSpell(options) {
       queue[index][3](error)
     }
 
-    queue = []
+    queue.length = 0
+  })
+
+  // Transformer which either immediately invokes `all` when everything has
+  // finished loading or queues the arguments.
+  return (tree, file, next) => {
+    if (loadError) {
+      next(loadError)
+    } else if (config.checker) {
+      all(tree, file, config)
+      next()
+    } else {
+      queue.push([tree, file, config, next])
+    }
   }
 }
 
 // Check a file for spelling mistakes.
 function all(tree, file, config) {
-  var ignore = config.ignore
-  var ignoreLiteral = config.ignoreLiteral
-  var ignoreDigits = config.ignoreDigits
-  var apos = config.normalizeApostrophes
-  var checker = config.checker
-  var cache = config.cache
+  const {
+    ignore,
+    ignoreLiteral,
+    ignoreDigits,
+    normalizeApostrophes,
+    checker,
+    cache
+  } = config
 
-  visit(tree, 'WordNode', checkWord)
-
-  // Check one word.
-  function checkWord(node, position, parent) {
-    var children = node.children
-    var word = toString(node)
-    var correct
-    var length
-    var index
-    var child
-    var reason
-    var message
-    var suggestions
+  visit(tree, 'WordNode', (node, position, parent) => {
+    const children = node.children
 
     if (ignoreLiteral && isLiteral(parent, position)) {
       return
     }
 
-    if (apos) {
-      word = word.replace(smart, straight)
+    let actual = toString(node)
+
+    if (normalizeApostrophes) {
+      actual = actual.replace(/’/g, "'")
     }
 
-    if (irrelevant(word)) {
+    if (irrelevant(actual)) {
       return
     }
 
     // Check the whole word.
-    correct = checker.correct(word)
+    let correct = checker.correct(actual)
 
     // If the whole word is not correct, check all its parts.
     // This makes sure that, if `alpha` and `bravo` are correct, `alpha-bravo`
     // is also seen as correct.
     if (!correct && children.length > 1) {
-      correct = true
-      length = children.length
-      index = -1
+      let index = -1
 
-      while (++index < length) {
-        child = children[index]
+      correct = true
+
+      while (++index < children.length) {
+        const child = children[index]
 
         if (child.type !== 'TextNode' || irrelevant(child.value)) {
           continue
@@ -144,13 +137,14 @@ function all(tree, file, config) {
     }
 
     if (!correct) {
-      reason = quotation(word, '`') + ' is misspelt'
+      let reason = quotation(actual, '`') + ' is misspelt'
+      let expected
 
       // Suggestions are very slow, so cache them (spelling mistakes other than
       // typos often occur multiple times).
-      if (own.call(cache, word)) {
-        suggestions = cache[word]
-        reason = concatPrefixToSuggestions(reason, suggestions)
+      if (own.call(cache, actual)) {
+        expected = cache[actual]
+        reason = concatPrefixToSuggestions(reason, expected)
       } else {
         if (config.count === config.max) {
           file.message(
@@ -163,25 +157,26 @@ function all(tree, file, config) {
         config.count++
 
         if (config.count < config.max) {
-          suggestions = checker.suggest(word)
+          expected = checker.suggest(actual)
 
-          if (suggestions.length !== 0) {
-            reason = concatPrefixToSuggestions(reason, suggestions)
+          if (expected.length > 0) {
+            reason = concatPrefixToSuggestions(reason, expected)
           }
         }
 
-        cache[word] = suggestions || []
+        cache[actual] = expected || []
       }
 
-      message = file.message(
-        reason,
-        node,
-        [source, word.toLowerCase().replace(/\W+/, '-')].join(':')
+      Object.assign(
+        file.message(
+          reason,
+          node,
+          [source, actual.toLowerCase().replace(/\W+/, '-')].join(':')
+        ),
+        {actual, expected: expected || []}
       )
-      message.actual = word
-      message.expected = suggestions || []
     }
-  }
+  })
 
   // Concatenate the formatted suggestions to a given prefix
   function concatPrefixToSuggestions(prefix, suggestions) {
@@ -192,8 +187,6 @@ function all(tree, file, config) {
 
   // Check if a word is irrelevant.
   function irrelevant(word) {
-    return (
-      ignore.indexOf(word) !== -1 || (ignoreDigits && digitsOnly.test(word))
-    )
+    return ignore.includes(word) || (ignoreDigits && /^\d+$/.test(word))
   }
 }
