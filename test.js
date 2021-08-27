@@ -1,11 +1,11 @@
-import assert from 'assert'
+import assert from 'node:assert'
+import {Buffer} from 'node:buffer'
 import test from 'tape'
 // @ts-expect-error: to type.
 import en from 'dictionary-en'
 // @ts-expect-error: to type.
 import enGb from 'dictionary-en-gb'
 import {retext} from 'retext'
-// @ts-expect-error: to type.
 import emoji from 'retext-emoji'
 import retextSpell from './index.js'
 
