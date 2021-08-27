@@ -1,4 +1,8 @@
 /**
+ * @typedef {import('nlcst').Root} Root
+ * @typedef {import('nlcst').Sentence} Sentence
+ * @typedef {import('vfile').VFile} VFile
+ *
  * @typedef {(onload: (error: Error|null|undefined, result?: unknown) => void) => void} Dictionary
  *
  * @typedef Options
@@ -39,15 +43,10 @@ const source = 'retext-spell'
 /**
  * Plugin to check spelling (with `nspell`).
  *
- * @type {import('unified').Plugin<[Options|Dictionary]>}
+ * @type {import('unified').Plugin<[Options|Dictionary], Root>}
  */
 // @ts-expect-error: prevent errors.
 export default function retextSpell(options = {}) {
-  /**
-   * @typedef {import('unist').Node} Node
-   * @typedef {import('vfile').VFile} VFile
-   */
-
   if (typeof options === 'function') {
     options = {dictionary: options}
   }
@@ -61,7 +60,7 @@ export default function retextSpell(options = {}) {
     normalizeApostrophes,
     personal
   } = options
-  /** @type {Array.<[Node, VFile, config, (error?: Error|null|undefined) => void]>} */
+  /** @type {Array.<[Root, VFile, config, (error?: Error|null|undefined) => void]>} */
   const queue = []
   /** @type {Error|null|undefined} */
   let loadError
@@ -136,8 +135,8 @@ export default function retextSpell(options = {}) {
 /**
  * Check a file for spelling mistakes.
  *
- * @param {import('unist').Node} tree
- * @param {import('vfile').VFile} file
+ * @param {Root} tree
+ * @param {VFile} file
  * @param {object} config
  * @param {string[]} config.ignore
  * @param {boolean} config.ignoreLiteral
@@ -149,11 +148,6 @@ export default function retextSpell(options = {}) {
  * @param {number} config.max
  */
 function all(tree, file, config) {
-  /**
-   * @typedef {import('unist').Parent} Parent
-   * @typedef {import('unist').Literal<string>} Literal
-   */
-
   const {
     ignore,
     ignoreLiteral,
@@ -165,7 +159,8 @@ function all(tree, file, config) {
     cache
   } = config
 
-  visit(tree, 'WordNode', (/** @type {Parent} */ node, position, parent) => {
+  visit(tree, 'WordNode', (node, position, parent_) => {
+    const parent = /** @type {Sentence} */ (parent_)
     const children = node.children
 
     if (
@@ -200,7 +195,7 @@ function all(tree, file, config) {
       correct = true
 
       while (++index < children.length) {
-        const child = /** @type {Literal} */ (children[index])
+        const child = children[index]
 
         if (child.type !== 'TextNode' || irrelevant(child.value)) {
           continue
