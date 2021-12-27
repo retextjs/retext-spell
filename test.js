@@ -70,7 +70,8 @@ test('should warn for misspelt words', (t) => {
             },
             fatal: false,
             actual: 'color',
-            expected: ['colon', 'colour', 'Colo']
+            expected: ['colon', 'colour', 'Colo'],
+            url: 'https://github.com/retextjs/retext-spell#readme'
           }
         ],
         'should emit messages'
