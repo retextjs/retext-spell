@@ -39,6 +39,7 @@ import {quotation} from 'quotation'
 const own = {}.hasOwnProperty
 
 const source = 'retext-spell'
+const url = 'https://github.com/retextjs/retext-spell#readme'
 
 /**
  * Plugin to check spelling (with `nspell`).
@@ -251,7 +252,7 @@ function all(tree, file, config) {
           node,
           [source, actual.toLowerCase().replace(/\W+/, '-')].join(':')
         ),
-        {actual, expected: expected || []}
+        {actual, expected: expected || [], url}
       )
     }
   })
