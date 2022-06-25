@@ -8,14 +8,37 @@
 [![Backers][backers-badge]][collective]
 [![Chat][chat-badge]][chat]
 
-[**retext**][retext] plugin to check spelling (with [`nspell`][nspell]).
+**[retext][]** plugin to check spelling.
+
+## Contents
+
+*   [What is this?](#what-is-this)
+*   [When should I use this?](#when-should-i-use-this)
+*   [Install](#install)
+*   [Use](#use)
+*   [API](#api)
+    *   [`unified().use(retextSpell, options)`](#unifieduseretextspell-options)
+*   [Messages](#messages)
+*   [Types](#types)
+*   [Compatibility](#compatibility)
+*   [Related](#related)
+*   [Contribute](#contribute)
+*   [License](#license)
+
+## What is this?
+
+This package is a [unified][] ([retext][]) plugin to check spelling with
+[`nspell`][nspell] and a [dictionary][dictionaries].
+
+## When should I use this?
+
+You can opt-into this plugin when you’re dealing with content that might contain
+spelling mistakes, and have authors that can fix that content.
 
 ## Install
 
-This package is [ESM only](https://gist.github.com/sindresorhus/a39789f98801d908bbc7ff3ecc99d99c):
-Node 12+ is needed to use it and it must be `import`ed instead of `require`d.
-
-[npm][]:
+This package is [ESM only][esm].
+In Node.js (version 12.20+, 14.14+, 16.0+, or 18.0+), install with [npm][]:
 
 ```sh
 npm install retext-spell
@@ -29,12 +52,11 @@ import {retext} from 'retext'
 import retextSpell from 'retext-spell'
 import dictionary from 'dictionary-en-gb'
 
-retext()
+const file = await retext()
   .use(retextSpell, dictionary)
   .process('Some useles documeant.')
-  .then((file) => {
-    console.error(reporter(file))
-  })
+
+console.error(reporter(file))
 ```
 
 Yields:
@@ -53,19 +75,24 @@ The default export is `retextSpell`.
 
 ### `unified().use(retextSpell, options)`
 
-> `retext-spell` is async; use [`process`][process], not `processSync`.
-
 Check spelling (with [`nspell`][nspell]).
 
-###### Signatures
+> ⚠️ **Important**: `retext-spell` is async.
+> You must use [`process`][process] instead of `processSync`.
+
+##### Signatures
 
 *   `retext().use(spell, dictionary)`
 *   `retext().use(spell, options)`
 
+##### `options`
+
+Configuration (optional).
+
 ###### `options.dictionary`
 
 A dictionary ([`Function`][dictionaries]).
-Result of requiring one of the dictionaries in
+Result of importing one of the dictionaries in
 [`wooorm/dictionaries`][dictionaries].
 
 ###### `options.personal`
@@ -99,10 +126,10 @@ By default, up to thirty words are suggested for.
 Further misspellings are still warned about, but without suggestions.
 Increasing this number significantly impacts performance.
 
-### Messages
+## Messages
 
-Each message is emitted as a [`VFileMessage`][message] on `file`, with the
-following fields:
+Each message is emitted as a [`VFileMessage`][vfile-message] on `file`, with
+the following fields:
 
 ###### `message.source`
 
@@ -120,24 +147,36 @@ Current not ok word (`string`, such as `'Useles'`).
 
 List of suggestions of words to use (`Array<string>`, such as `['Useless']`).
 
+## Types
+
+This package is fully typed with [TypeScript][].
+It exports the additional types `Options` and `Dictionary`.
+
+## Compatibility
+
+Projects maintained by the unified collective are compatible with all maintained
+versions of Node.js.
+As of now, that is Node.js 12.20+, 14.14+, 16.0+, and 18.0+.
+Our projects sometimes work with older versions, but this is not guaranteed.
+
 ## Related
 
 *   [`retext-contractions`](https://github.com/retextjs/retext-contractions)
-    — Check apostrophe use in contractions
+    — check apostrophe use in contractions
 *   [`retext-diacritics`](https://github.com/retextjs/retext-diacritics)
-    — Check for proper use of diacritics
+    — check for proper use of diacritics
 *   [`retext-indefinite-article`](https://github.com/retextjs/retext-indefinite-article)
-    — Check if indefinite articles (`a`, `an`) are used correctly
+    — check if indefinite articles (`a`, `an`) are used correctly
 *   [`retext-redundant-acronyms`](https://github.com/retextjs/retext-redundant-acronyms)
-    — Check for redundant acronyms (`ATM machine`)
+    — check for redundant acronyms (`ATM machine`)
 *   [`retext-repeated-words`](https://github.com/retextjs/retext-repeated-words)
-    — Check `for for` repeated words
+    — check `for for` repeated words
 *   [`retext-emoji`](https://github.com/retextjs/retext-emoji)
-    — Classify emoji, gemoji, emoticons as syntax
+    — classify emoji, gemoji, emoticons
 *   [`retext-syntax-mentions`](https://github.com/retextjs/retext-syntax-mentions)
-    — Classify [**@mentions**](https://github.com/blog/821) as syntax
+    — classify [**@mentions**](https://github.com/blog/821) as syntax
 *   [`retext-syntax-urls`](https://github.com/retextjs/retext-syntax-urls)
-    — Classify URLs and filepaths as syntax
+    — classify URLs and filepaths as syntax
 
 ## Contribute
 
@@ -183,21 +222,27 @@ abide by its terms.
 
 [npm]: https://docs.npmjs.com/cli/install
 
+[esm]: https://gist.github.com/sindresorhus/a39789f98801d908bbc7ff3ecc99d99c
+
+[typescript]: https://www.typescriptlang.org
+
 [health]: https://github.com/retextjs/.github
 
-[contributing]: https://github.com/retextjs/.github/blob/HEAD/contributing.md
+[contributing]: https://github.com/retextjs/.github/blob/main/contributing.md
 
-[support]: https://github.com/retextjs/.github/blob/HEAD/support.md
+[support]: https://github.com/retextjs/.github/blob/main/support.md
 
-[coc]: https://github.com/retextjs/.github/blob/HEAD/code-of-conduct.md
+[coc]: https://github.com/retextjs/.github/blob/main/code-of-conduct.md
 
 [license]: license
 
 [author]: https://wooorm.com
 
+[unified]: https://github.com/unifiedjs/unified
+
 [retext]: https://github.com/retextjs/retext
 
-[message]: https://github.com/vfile/vfile-message
+[vfile-message]: https://github.com/vfile/vfile-message
 
 [literal]: https://github.com/syntax-tree/nlcst-is-literal#isliteralparent-index
 
