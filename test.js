@@ -371,7 +371,7 @@ test('should integrate w/ `retext-emoji`', (t) => {
 /**
  * @param {import('tape').Test} t
  * @param {import('vfile').VFile} file
- * @param {string[]} expected
+ * @param {Array<string>} expected
  */
 function check(t, file, expected) {
   t.doesNotThrow(() => {

@@ -74,7 +74,7 @@ Result of requiring one of the dictionaries in
 
 ###### `options.ignore`
 
-List of words to ignore (`Array.<string>`, default `[]`).
+List of words to ignore (`Array<string>`, default `[]`).
 
 ###### `options.ignoreLiteral`
 
@@ -118,7 +118,7 @@ Current not ok word (`string`, such as `'Useles'`).
 
 ###### `message.expected`
 
-List of suggestions of words to use (`Array.<string>`, such as `['Useless']`).
+List of suggestions of words to use (`Array<string>`, such as `['Useless']`).
 
 ## Related
 

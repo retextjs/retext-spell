@@ -11,7 +11,7 @@
  *   Result of importing one of the dictionaries in `wooorm/dictionaries`.
  * @property {string|Uint8Array} [personal]
  *   Personal dictionary (`string` or a `Buffer` in UTF-8).
- * @property {string[]} [ignore]
+ * @property {Array<string>} [ignore]
  *   List of words to ignore.
  * @property {boolean} [ignoreLiteral=true]
  *   Whether to ignore literal words.
@@ -27,6 +27,17 @@
  *   By default, up to thirty words are suggested for.
  *   Further misspellings are still warned about, but without suggestions.
  *   Increasing this number significantly impacts performance.
+ *
+ * @typedef Config
+ * @property {Array<string>} ignore
+ * @property {boolean} ignoreLiteral
+ * @property {boolean} ignoreDigits
+ * @property {boolean} normalizeApostrophes
+ * @property {any} checker
+ * @property {Record<string, Array<string>>} cache
+ * @property {number} count
+ * @property {number} max
+
  */
 
 // @ts-expect-error: to type.
@@ -61,7 +72,7 @@ export default function retextSpell(options = {}) {
     normalizeApostrophes,
     personal
   } = options
-  /** @type {Array.<[Root, VFile, config, (error?: Error|null|undefined) => void]>} */
+  /** @type {Array<[Root, VFile, Config, (error?: Error|null|undefined) => void]>} */
   const queue = []
   /** @type {Error|null|undefined} */
   let loadError
@@ -70,6 +81,7 @@ export default function retextSpell(options = {}) {
     throw new TypeError('Expected `Object`, got `' + dictionary + '`')
   }
 
+  /** @type {Config} */
   const config = {
     ignoreLiteral:
       ignoreLiteral === null || ignoreLiteral === undefined
@@ -97,10 +109,13 @@ export default function retextSpell(options = {}) {
     loadError = error
 
     if (dictionary) {
+      // To do: nspell.
+      // type-coverage:ignore-next-line
       config.checker = nspell(dictionary)
 
       if (personal) {
-        // @ts-expect-error: hush.
+        // To do: nspell.
+        // type-coverage:ignore-next-line
         config.checker.personal(personal)
       }
     }
@@ -124,6 +139,8 @@ export default function retextSpell(options = {}) {
   return (tree, file, next) => {
     if (loadError) {
       next(loadError)
+      // To do: nspell.
+      // type-coverage:ignore-next-line
     } else if (config.checker) {
       all(tree, file, config)
       next()
@@ -138,15 +155,7 @@ export default function retextSpell(options = {}) {
  *
  * @param {Root} tree
  * @param {VFile} file
- * @param {object} config
- * @param {string[]} config.ignore
- * @param {boolean} config.ignoreLiteral
- * @param {boolean} config.ignoreDigits
- * @param {boolean} config.normalizeApostrophes
- * @param {any} config.checker
- * @param {Record<string, string[]>} config.cache
- * @param {number} config.count
- * @param {number} config.max
+ * @param {Config} config
  */
 function all(tree, file, config) {
   const {
@@ -212,7 +221,7 @@ function all(tree, file, config) {
 
     if (!correct) {
       let reason = quotation(actual, '`') + ' is misspelt'
-      /** @type {string[]|undefined} */
+      /** @type {Array<string>|undefined} */
       let expected
 
       // Suggestions are very slow, so cache them (spelling mistakes other than
@@ -261,7 +270,7 @@ function all(tree, file, config) {
    * Concatenate the formatted suggestions to a given prefix
    *
    * @param {string} prefix
-   * @param {Array.<string>} suggestions
+   * @param {Array<string>} suggestions
    * @returns {string}
    */
   function concatPrefixToSuggestions(prefix, suggestions) {
