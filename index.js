@@ -17,6 +17,8 @@
  *   Whether to ignore literal words.
  * @property {boolean} [ignoreDigits=true]
  *   Whether to ignore “words” that contain only digits, such as `123456`.
+ * @property {boolean} [ignoreAnyDigits=false]
+ *   Whether to ignore “words” that contain *any* digits, such as `2:41pm` or `A11y`.
  * @property {boolean} [normalizeApostrophes=true]
  *   Deal with apostrophes.
  *   Whether to swap smart apostrophes (`’`) with straight apostrophes (`'`)
@@ -32,6 +34,7 @@
  * @property {Array<string>} ignore
  * @property {boolean} ignoreLiteral
  * @property {boolean} ignoreDigits
+ * @property {boolean} ignoreAnyDigits
  * @property {boolean} normalizeApostrophes
  * @property {any} checker
  * @property {Record<string, Array<string>>} cache
@@ -69,6 +72,7 @@ export default function retextSpell(options = {}) {
     max,
     ignoreLiteral,
     ignoreDigits,
+    ignoreAnyDigits,
     normalizeApostrophes,
     personal
   } = options
@@ -89,6 +93,10 @@ export default function retextSpell(options = {}) {
         : ignoreLiteral,
     ignoreDigits:
       ignoreDigits === null || ignoreDigits === undefined ? true : ignoreDigits,
+    ignoreAnyDigits:
+      ignoreAnyDigits === null || ignoreAnyDigits === undefined
+        ? false
+        : ignoreAnyDigits,
     normalizeApostrophes:
       normalizeApostrophes === null || normalizeApostrophes === undefined
         ? true
@@ -162,6 +170,7 @@ function all(tree, file, config) {
     ignore,
     ignoreLiteral,
     ignoreDigits,
+    ignoreAnyDigits,
     normalizeApostrophes,
     // To do: nspell.
     // type-coverage:ignore-next-line
@@ -286,6 +295,10 @@ function all(tree, file, config) {
    * @returns {boolean}
    */
   function irrelevant(word) {
-    return ignore.includes(word) || (ignoreDigits && /^\d+$/.test(word))
+    return (
+      ignore.includes(word) ||
+      (ignoreDigits && /^\d+$/.test(word)) ||
+      (ignoreAnyDigits && /\d/.test(word))
+    )
   }
 }
