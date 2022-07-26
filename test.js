@@ -223,6 +223,17 @@ test('should ignore digits', (t) => {
     }, t.ifErr)
 })
 
+test('should ignore words that contain any digits', (t) => {
+  t.plan(1)
+
+  retext()
+    .use(retextSpell, enGb)
+    .process('2:41pm')
+    .then((file) => {
+      check(t, file, [])
+    }, t.ifErr)
+})
+
 test('should treat smart apostrophes as straight apostrophes', (t) => {
   t.plan(3)
 
