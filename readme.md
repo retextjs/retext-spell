@@ -111,6 +111,7 @@ Whether to ignore [literal words][literal] (`boolean?`, default `true`).
 
 Whether to ignore “words” that contain only digits, such as `123456`
 (`boolean?`, default `true`).
+
 ###### `options.ignoreAnyDigits`
 
 Whether to ignore “words” that contain *any* digits, such as `2:41pm` or `A11y`.
