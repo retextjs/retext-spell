@@ -223,15 +223,12 @@ test('should ignore digits', (t) => {
     }, t.ifErr)
 })
 
-test('should ignore words that contain any digits', (t) => {
+test('should ignore times', (t) => {
   t.plan(1)
 
   retext()
-    .use(retextSpell, {
-      dictionary: enGb,
-      ignoreAnyDigits: true
-    })
-    .process('2:41pm is a gr8 time for A11y enthusiasts.')
+    .use(retextSpell, enGb)
+    .process('2:41pm')
     .then((file) => {
       check(t, file, [])
     }, t.ifErr)
@@ -322,17 +319,6 @@ test('should not ignore words that include digits', (t) => {
     .process('768x1024')
     .then((file) => {
       check(t, file, ['1:1-1:9: `768x1024` is misspelt'])
-    }, t.ifErr)
-})
-
-test('...unless `ignoreAnyDigits` is true', (t) => {
-  t.plan(1)
-
-  retext()
-    .use(retextSpell, {dictionary: enGb, ignoreAnyDigits: true})
-    .process('768x1024')
-    .then((file) => {
-      check(t, file, [])
     }, t.ifErr)
 })
 
