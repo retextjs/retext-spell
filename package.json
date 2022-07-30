@@ -79,7 +79,15 @@
     "trailingComma": "none"
   },
   "xo": {
-    "prettier": true
+    "prettier": true,
+    "overrides": [
+      {
+        "files": "test.js",
+        "rules": {
+          "no-await-in-loop": "off"
+        }
+      }
+    ]
   },
   "remarkConfig": {
     "plugins": [
