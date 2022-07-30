@@ -109,8 +109,8 @@ Whether to ignore [literal words][literal] (`boolean?`, default `true`).
 
 ###### `options.ignoreDigits`
 
-Whether to ignore “words” that contain only digits, such as `123456`
-(`boolean?`, default `true`).
+Whether to ignore “words” that contain only digits or times, such as
+`123456` or `2:41pm` (`boolean?`, default `true`).
 
 ###### `options.normalizeApostrophes`
 

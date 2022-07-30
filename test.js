@@ -223,6 +223,24 @@ test('should ignore digits', (t) => {
     }, t.ifErr)
 })
 
+test('should ignore times', (t) => {
+  t.plan(2)
+
+  retext()
+    .use(retextSpell, enGb)
+    .process('Let’s meet at 2:41pm.')
+    .then((file) => {
+      check(t, file, [])
+    }, t.ifErr)
+
+  retext()
+    .use(retextSpell, enGb)
+    .process("On my way! ETA 11:50!")
+    .then((file) => {
+      check(t, file, []);
+    }, t.ifErr);
+})
+
 test('should treat smart apostrophes as straight apostrophes', (t) => {
   t.plan(3)
 

@@ -16,7 +16,7 @@
  * @property {boolean} [ignoreLiteral=true]
  *   Whether to ignore literal words.
  * @property {boolean} [ignoreDigits=true]
- *   Whether to ignore “words” that contain only digits, such as `123456`.
+ *   Whether to ignore “words” that contain only digits or are times, such as `123456` or `2:41pm`.
  * @property {boolean} [normalizeApostrophes=true]
  *   Deal with apostrophes.
  *   Whether to swap smart apostrophes (`’`) with straight apostrophes (`'`)
@@ -286,6 +286,10 @@ function all(tree, file, config) {
    * @returns {boolean}
    */
   function irrelevant(word) {
-    return ignore.includes(word) || (ignoreDigits && /^\d+$/.test(word))
+    return (
+      ignore.includes(word) ||
+      (ignoreDigits && /^\d+$/.test(word)) ||
+      (ignoreDigits && /^\d{1,2}:\d{2}(?:[ap]\.?m\.?)?$/i.test(word))
+    )
   }
 }
