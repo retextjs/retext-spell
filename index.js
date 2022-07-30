@@ -289,7 +289,7 @@ function all(tree, file, config) {
     return (
       ignore.includes(word) ||
       (ignoreDigits && /^\d+$/.test(word)) ||
-      (ignoreDigits && /^\d{1,2}:\d{2}(?:[ap]\.?m)?$/i.test(word))
+      (ignoreDigits && /^\d{1,2}:\d{2}(?:[ap]\.?m\.?)?$/i.test(word))
     )
   }
 }
