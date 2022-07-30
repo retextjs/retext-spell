@@ -235,10 +235,10 @@ test('should ignore times', (t) => {
 
   retext()
     .use(retextSpell, enGb)
-    .process("On my way! ETA 11:50!")
+    .process('On my way! ETA 11:50!')
     .then((file) => {
-      check(t, file, []);
-    }, t.ifErr);
+      check(t, file, [])
+    }, t.ifErr)
 })
 
 test('should treat smart apostrophes as straight apostrophes', (t) => {
