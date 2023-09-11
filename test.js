@@ -54,26 +54,25 @@ test('should warn for misspelt words', async (t) => {
   const file = await retext().use(retextSpell, enGb).process('color')
 
   t.deepEqual(
-    JSON.parse(JSON.stringify(file.messages)),
-    [
-      {
-        name: '1:1-1:6',
-        message: '`color` is misspelt; did you mean `colon`, `colour`, `Colo`?',
-        reason: '`color` is misspelt; did you mean `colon`, `colour`, `Colo`?',
-        line: 1,
-        column: 1,
-        source: 'retext-spell',
-        ruleId: 'color',
-        position: {
-          start: {line: 1, column: 1, offset: 0},
-          end: {line: 1, column: 6, offset: 5}
-        },
-        fatal: false,
-        actual: 'color',
-        expected: ['colon', 'colour', 'Colo'],
-        url: 'https://github.com/retextjs/retext-spell#readme'
-      }
-    ],
+    JSON.parse(JSON.stringify({...file.messages[0], ancestors: []})),
+    {
+      ancestors: [],
+      column: 1,
+      fatal: false,
+      message: '`color` is misspelt; did you mean `colon`, `colour`, `Colo`?',
+      line: 1,
+      name: '1:1-1:6',
+      place: {
+        start: {line: 1, column: 1, offset: 0},
+        end: {line: 1, column: 6, offset: 5}
+      },
+      reason: '`color` is misspelt; did you mean `colon`, `colour`, `Colo`?',
+      ruleId: 'color',
+      source: 'retext-spell',
+      actual: 'color',
+      expected: ['colon', 'colour', 'Colo'],
+      url: 'https://github.com/retextjs/retext-spell#readme'
+    },
     'should emit messages'
   )
 

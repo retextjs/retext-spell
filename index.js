@@ -72,7 +72,7 @@ export default function retextSpell(options = {}) {
     normalizeApostrophes,
     personal
   } = options
-  /** @type {Array<[Root, VFile, Config, (error?: Error|null|undefined) => void]>} */
+  /** @type {Array<[Root, VFile, Config, import('unified').TransformCallback<Root>]>} */
   const queue = []
   /** @type {Error|null|undefined} */
   let loadError
@@ -128,7 +128,8 @@ export default function retextSpell(options = {}) {
         all(...parameters)
       }
 
-      queue[index][3](error)
+      // To do: `dictionary`s should not pass `null`.
+      queue[index][3](error || undefined)
     }
 
     queue.length = 0
@@ -175,7 +176,7 @@ function all(tree, file, config) {
 
     if (
       !parent ||
-      position === null ||
+      position === undefined ||
       (ignoreLiteral && isLiteral(parent, position))
     ) {
       return
