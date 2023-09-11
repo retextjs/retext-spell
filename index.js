@@ -33,7 +33,7 @@
  * @property {boolean} ignoreLiteral
  * @property {boolean} ignoreDigits
  * @property {boolean} normalizeApostrophes
- * @property {any} checker
+ * @property {unknown} checker
  * @property {Record<string, Array<string>>} cache
  * @property {number} count
  * @property {number} max
@@ -114,8 +114,7 @@ export default function retextSpell(options = {}) {
       config.checker = nspell(dictionary)
 
       if (personal) {
-        // To do: nspell.
-        // type-coverage:ignore-next-line
+        // @ts-expect-error: to do: type nspell.
         config.checker.personal(personal)
       }
     }
@@ -140,8 +139,6 @@ export default function retextSpell(options = {}) {
   return (tree, file, next) => {
     if (loadError) {
       next(loadError)
-      // To do: nspell.
-      // type-coverage:ignore-next-line
     } else if (config.checker) {
       all(tree, file, config)
       next()
@@ -164,8 +161,6 @@ function all(tree, file, config) {
     ignoreLiteral,
     ignoreDigits,
     normalizeApostrophes,
-    // To do: nspell.
-    // type-coverage:ignore-next-line
     checker,
     cache
   } = config
@@ -194,7 +189,7 @@ function all(tree, file, config) {
 
     // Check the whole word.
     /** @type {boolean} */
-    // type-coverage:ignore-next-line
+    // @ts-expect-error: to do: type nspell.
     let correct = checker.correct(actual)
 
     // If the whole word is not correct, check all its parts.
@@ -212,8 +207,7 @@ function all(tree, file, config) {
           continue
         }
 
-        // To do: nspell.
-        // type-coverage:ignore-next-line
+        // @ts-expect-error: to do: type nspell.
         if (!checker.correct(child.value)) {
           correct = false
         }
@@ -242,8 +236,7 @@ function all(tree, file, config) {
         config.count++
 
         if (config.count < config.max) {
-          // To do: nspell.
-          // type-coverage:ignore-next-line
+          // @ts-expect-error: to do: type nspell.
           expected = checker.suggest(actual)
 
           // @ts-expect-error: hush.
