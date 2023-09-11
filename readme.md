@@ -46,6 +46,20 @@ In Node.js (version 16+), install with [npm][]:
 npm install retext-spell
 ```
 
+In Deno with [`esm.sh`][esmsh]:
+
+```js
+import retextSpell from 'https://esm.sh/retext-spell@6'
+```
+
+In browsers with [`esm.sh`][esmsh]:
+
+```html
+<script type="module">
+  import retextSpell from 'https://esm.sh/retext-spell@6?bundle'
+</script>
+```
+
 ## Use
 
 ```js
@@ -212,6 +226,8 @@ abide by its terms.
 [npm]: https://docs.npmjs.com/cli/install
 
 [esm]: https://gist.github.com/sindresorhus/a39789f98801d908bbc7ff3ecc99d99c
+
+[esmsh]: https://esm.sh
 
 [typescript]: https://www.typescriptlang.org
 
