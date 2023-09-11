@@ -1,5 +1,4 @@
 /**
- * @typedef {import('./index.js').Dictionary} Dictionary
  */
 
 import assert from 'node:assert/strict'
@@ -10,15 +9,25 @@ import retextEmoji from 'retext-emoji'
 import retextSpell from './index.js'
 
 test('retextSpell', async function (t) {
+  await t.test('should expose the public api', async function () {
+    assert.deepEqual(Object.keys(await import('./index.js')).sort(), [
+      'default'
+    ])
+  })
+
   await t.test('should throw when without `options`', async function () {
-    assert.throws(() => {
+    assert.throws(function () {
       // @ts-expect-error: check how the runtime handles missing options.
       retext().use(retextSpell).freeze()
-    }, /^TypeError: Expected `Object`, got `undefined`$/)
+    }, /Missing `dictionary` in options/)
   })
 
   await t.test('should fail load errors on the VFile', async function () {
-    const processor = retext().use(retextSpell, failingDictionary)
+    const processor = retext().use(retextSpell, function (callback) {
+      setImmediate(function () {
+        callback(new Error('load error'))
+      })
+    })
 
     try {
       await processor.process('')
@@ -33,13 +42,6 @@ test('retextSpell', async function (t) {
       assert.fail()
     } catch (error) {
       assert.match(String(error), /load error/)
-    }
-
-    /** @type {Dictionary} */
-    function failingDictionary(callback) {
-      setImmediate(() => {
-        callback(new Error('load error'))
-      })
     }
   })
 
