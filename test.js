@@ -57,13 +57,15 @@ test('retextSpell', async function (t) {
         expected: ['color', 'dolor'],
         fatal: false,
         line: 1,
-        message: '`kolor` is misspelt; did you mean `color`, `dolor`?',
+        message:
+          'Unexpected unknown word `kolor`, expected for example `color`, `dolor`',
         name: '1:1-1:6',
         place: {
           start: {column: 1, line: 1, offset: 0},
           end: {column: 6, line: 1, offset: 5}
         },
-        reason: '`kolor` is misspelt; did you mean `color`, `dolor`?',
+        reason:
+          'Unexpected unknown word `kolor`, expected for example `color`, `dolor`',
         ruleId: 'kolor',
         source: 'retext-spell',
         url: 'https://github.com/retextjs/retext-spell#readme'
@@ -75,7 +77,7 @@ test('retextSpell', async function (t) {
     const file = await retext().use(retextSpell, dictionaryEn).process('kolor')
 
     assert.deepEqual(file.messages.map(String), [
-      '1:1-1:6: `kolor` is misspelt; did you mean `color`, `dolor`?'
+      '1:1-1:6: Unexpected unknown word `kolor`, expected for example `color`, `dolor`'
     ])
   })
 
@@ -85,9 +87,9 @@ test('retextSpell', async function (t) {
       .process('kolor and kolor and kolor')
 
     assert.deepEqual(file.messages.map(String), [
-      '1:1-1:6: `kolor` is misspelt; did you mean `color`, `dolor`?',
-      '1:11-1:16: `kolor` is misspelt; did you mean `color`, `dolor`?',
-      '1:21-1:26: `kolor` is misspelt; did you mean `color`, `dolor`?'
+      '1:1-1:6: Unexpected unknown word `kolor`, expected for example `color`, `dolor`',
+      '1:11-1:16: Unexpected unknown word `kolor`, expected for example `color`, `dolor`',
+      '1:21-1:26: Unexpected unknown word `kolor`, expected for example `color`, `dolor`'
     ])
   })
 
@@ -109,11 +111,11 @@ test('retextSpell', async function (t) {
       .process('Soem useles mispelt documeant')
 
     assert.deepEqual(file.messages.map(String), [
-      '1:1-1:5: `Soem` is misspelt',
-      '1:6-1:12: Too many misspellings; no further spell suggestions are given',
-      '1:6-1:12: `useles` is misspelt',
-      '1:13-1:20: `mispelt` is misspelt',
-      '1:21-1:30: `documeant` is misspelt'
+      '1:1-1:5: Unexpected unknown word `Soem`, expected for example `Seem`, `Stem`, `Sum`, `Poem`, `Some`',
+      '1:6-1:12: No longer generating suggestions to improve performance',
+      '1:6-1:12: Unexpected unknown word `useles`',
+      '1:13-1:20: Unexpected unknown word `mispelt`',
+      '1:21-1:30: Unexpected unknown word `documeant`'
     ])
   })
 
@@ -133,7 +135,7 @@ test('retextSpell', async function (t) {
         .process('“kolor”')
 
       assert.deepEqual(file.messages.map(String), [
-        '1:2-1:7: `kolor` is misspelt; did you mean `color`, `dolor`?'
+        '1:2-1:7: Unexpected unknown word `kolor`, expected for example `color`, `dolor`'
       ])
     }
   )
@@ -146,7 +148,7 @@ test('retextSpell', async function (t) {
         .process('wrongely-spelled-word')
 
       assert.deepEqual(file.messages.map(String), [
-        '1:1-1:22: `wrongely-spelled-word` is misspelt'
+        '1:1-1:22: Unexpected unknown word `wrongely-spelled-word`'
       ])
     }
   )
@@ -189,8 +191,8 @@ test('retextSpell', async function (t) {
         .process('123456 alpha 3.14')
 
       assert.deepEqual(file.messages.map(String), [
-        '1:1-1:7: `123456` is misspelt; did you mean `12th456`, `12th3456`, `12th56`?',
-        '1:14-1:18: `3.14` is misspelt; did you mean `3.14th`?'
+        '1:1-1:7: Unexpected unknown word `123456`, expected for example `12th456`, `12th3456`, `12th56`',
+        '1:14-1:18: Unexpected unknown word `3.14`, expected for example `3.14th`'
       ])
     }
   )
@@ -201,7 +203,7 @@ test('retextSpell', async function (t) {
       .process('768x1024')
 
     assert.deepEqual(file.messages.map(String), [
-      '1:1-1:9: `768x1024` is misspelt; did you mean `76th8x1024`, `76thx1024`?'
+      '1:1-1:9: Unexpected unknown word `768x1024`, expected for example `76th8x1024`, `76thx1024`'
     ])
   })
 
@@ -223,8 +225,8 @@ test('retextSpell', async function (t) {
       .process('color coloor colour')
 
     assert.deepEqual(file.messages.map(String), [
-      '1:1-1:6: `color` is misspelt; did you mean `dolor`, `colors`, `colon`, `colour`, `Colo`?',
-      '1:7-1:13: `coloor` is misspelt; did you mean `colour`?'
+      '1:1-1:6: Unexpected unknown word `color`, expected for example `dolor`, `colors`, `colon`, `colour`, `Colo`',
+      '1:7-1:13: Unexpected unknown word `coloor`, expected for example `colour`'
     ])
   })
 
@@ -233,7 +235,7 @@ test('retextSpell', async function (t) {
       .use(retextSpell, {dictionary: dictionaryEn})
       .process('Pages ⚡️')
 
-    assert.match(String(file.messages), /`️` is misspelt/)
+    assert.match(String(file.messages), /Unexpected unknown word `️`,/)
   })
 
   await t.test('should integrate w/ `retext-emoji` (2)', async function () {
