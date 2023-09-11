@@ -14,6 +14,7 @@ import retextSpell from './index.js'
 test('should throw when without `options`', (t) => {
   t.throws(
     () => {
+      // @ts-expect-error: to do.
       retext().use(retextSpell).freeze()
     },
     /^TypeError: Expected `Object`, got `undefined`$/,
