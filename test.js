@@ -1,16 +1,13 @@
-/**
- */
-
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import dictionaryEn from 'dictionary-en'
 import {retext} from 'retext'
 import retextEmoji from 'retext-emoji'
-import retextSpell from './index.js'
+import retextSpell from 'retext-spell'
 
 test('retextSpell', async function (t) {
   await t.test('should expose the public api', async function () {
-    assert.deepEqual(Object.keys(await import('./index.js')).sort(), [
+    assert.deepEqual(Object.keys(await import('retext-spell')).sort(), [
       'default'
     ])
   })

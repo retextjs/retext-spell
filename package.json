@@ -30,8 +30,7 @@
   ],
   "sideEffects": false,
   "type": "module",
-  "main": "index.js",
-  "types": "index.d.ts",
+  "exports": "./index.js",
   "files": [
     "lib/",
     "index.d.ts",
@@ -43,6 +42,7 @@
     "nlcst-to-string": "^4.0.0",
     "nspell": "^2.0.0",
     "quotation": "^2.0.0",
+    "unified": "^11.0.0",
     "unist-util-visit": "^5.0.0",
     "vfile": "^6.0.0"
   },
