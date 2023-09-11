@@ -18,6 +18,8 @@
 *   [Use](#use)
 *   [API](#api)
     *   [`unified().use(retextSpell, options)`](#unifieduseretextspell-options)
+    *   [`Dictionary`](#dictionary)
+    *   [`Options`](#options)
 *   [Messages](#messages)
 *   [Types](#types)
 *   [Compatibility](#compatibility)
@@ -38,7 +40,7 @@ spelling mistakes, and have authors that can fix that content.
 ## Install
 
 This package is [ESM only][esm].
-In Node.js (version 12.20+, 14.14+, 16.0+, or 18.0+), install with [npm][]:
+In Node.js (version 16+), install with [npm][]:
 
 ```sh
 npm install retext-spell
@@ -47,13 +49,13 @@ npm install retext-spell
 ## Use
 
 ```js
-import {reporter} from 'vfile-reporter'
+import dictionaryEn from 'dictionary-en'
 import {retext} from 'retext'
 import retextSpell from 'retext-spell'
-import dictionary from 'dictionary-en-gb'
+import {reporter} from 'vfile-reporter'
 
 const file = await retext()
-  .use(retextSpell, dictionary)
+  .use(retextSpell, {dictionary: dictionaryEn})
   .process('Some useles documeant.')
 
 console.error(reporter(file))
@@ -62,8 +64,8 @@ console.error(reporter(file))
 Yields:
 
 ```txt
-   1:6-1:12  warning  `useles` is misspelt; did you mean `useless`?      useles     retext-spell
-  1:13-1:22  warning  `documeant` is misspelt; did you mean `document`?  documeant  retext-spell
+1:6-1:12  warning Unexpected unknown word `useles`, expected for example `useless`     useles    retext-spell
+1:13-1:22 warning Unexpected unknown word `documeant`, expected for example `document` documeant retext-spell
 
 ⚠ 2 warnings
 ```
@@ -71,93 +73,80 @@ Yields:
 ## API
 
 This package exports no identifiers.
-The default export is `retextSpell`.
+The default export is [`retextSpell`][api-retext-spell].
 
 ### `unified().use(retextSpell, options)`
 
-Check spelling (with [`nspell`][nspell]).
+Check spelling.
 
-> ⚠️ **Important**: `retext-spell` is async.
-> You must use [`process`][process] instead of `processSync`.
+###### Parameters
 
-##### Signatures
+*   `options` ([`Options`][api-options], **required**)
+    — configuration
 
-*   `retext().use(spell, dictionary)`
-*   `retext().use(spell, options)`
+###### Returns
 
-##### `options`
+Transform ([`Transformer`][unified-transformer]).
 
-Configuration (optional).
+### `Dictionary`
 
-###### `options.dictionary`
+Dictionary function (TypeScript type).
 
-A dictionary ([`Function`][dictionaries]).
-Result of importing one of the dictionaries in
-[`wooorm/dictionaries`][dictionaries].
+###### Type
 
-###### `options.personal`
+```ts
+type Dictionary = (onload: OnLoad) => undefined | void
 
-[Personal][] dictionary (`string` or a `Buffer` in UTF-8, optional).
+type OnLoad = (error: Error | undefined, result?: unknown) => undefined | void
+```
 
-###### `options.ignore`
+### `Options`
 
-List of words to ignore (`Array<string>`, default `[]`).
+Configuration (TypeScript type).
 
-###### `options.ignoreLiteral`
+###### Fields
 
-Whether to ignore [literal words][literal] (`boolean?`, default `true`).
-
-###### `options.ignoreDigits`
-
-Whether to ignore “words” that contain only digits or times, such as
-`123456` or `2:41pm` (`boolean?`, default `true`).
-
-###### `options.normalizeApostrophes`
-
-Deal with apostrophes (`boolean?`, default `true`).
-Whether to swap smart apostrophes (`’`) with straight apostrophes (`'`) before
-checking spelling.
-Dictionaries typically support this, but this option can be used if not.
-
-###### `options.max`
-
-Number of unique words to suggest for (`number?`, default `30`).
-By default, up to thirty words are suggested for.
-Further misspellings are still warned about, but without suggestions.
-Increasing this number significantly impacts performance.
+*   `dictionary` ([`Dictionary`][api-dictionary], **required**)
+    — dictionary function;
+    result of importing one of the dictionaries in
+    [`wooorm/dictionaries`][dictionaries]
+*   `ignore` (`Array<string>`, optional)
+    — list of words to ignore
+*   `ignoreLiteral` (`boolean`, default: `true`)
+    — whether to ignore [literal words][nlcst-is-literal]
+*   `ignoreDigits` (`boolean`, default: `true`)
+    — whether to ignore “words” that contain digits or times such as `123456`
+    or `2:41pm`
+*   `max` (`number`, default: `30`)
+    — number of times to suggest;
+    further misspellings do not get suggestions
+*   `normalizeApostrophes` (`boolean`, default: `true`)
+    — normalize smart apostrophes (`’`) as straight (`'`) apostrophes;
+    dictionaries sometimes don’t support smart apostrophes
+*   `personal` (`Buffer` in UTF-8 or `string`, optional)
+    — [personal][nspell-personal] dictionary to use
 
 ## Messages
 
 Each message is emitted as a [`VFileMessage`][vfile-message] on `file`, with
-the following fields:
-
-###### `message.source`
-
-Name of this plugin (`'retext-spell'`).
-
-###### `message.ruleId`
-
-Normalized not ok word (`string`, such as `'useles'`).
-
-###### `message.actual`
-
-Current not ok word (`string`, such as `'Useles'`).
-
-###### `message.expected`
-
-List of suggestions of words to use (`Array<string>`, such as `['Useless']`).
+`source` set to `'retext-spell'`, `ruleId` to the normalized unknown word,
+`actual` to the unknown word, and `expected` to an array with suggestions.
 
 ## Types
 
 This package is fully typed with [TypeScript][].
-It exports the additional types `Options` and `Dictionary`.
+It exports the additional types [`Dictionary`][api-dictionary] and
+[`Options`][api-options].
 
 ## Compatibility
 
-Projects maintained by the unified collective are compatible with all maintained
+Projects maintained by the unified collective are compatible with maintained
 versions of Node.js.
-As of now, that is Node.js 12.20+, 14.14+, 16.0+, and 18.0+.
-Our projects sometimes work with older versions, but this is not guaranteed.
+
+When we cut a new major release, we drop support for unmaintained versions of
+Node.
+This means we try to keep the current release line, `retext-spell@^5`,
+compatible with Node.js 12.
 
 ## Related
 
@@ -206,9 +195,9 @@ abide by its terms.
 
 [downloads]: https://www.npmjs.com/package/retext-spell
 
-[size-badge]: https://img.shields.io/bundlephobia/minzip/retext-spell.svg
+[size-badge]: https://img.shields.io/bundlejs/size/retext-spell
 
-[size]: https://bundlephobia.com/result?p=retext-spell
+[size]: https://bundlejs.com/?q=retext-spell
 
 [sponsors-badge]: https://opencollective.com/unified/sponsors/badge.svg
 
@@ -238,18 +227,24 @@ abide by its terms.
 
 [author]: https://wooorm.com
 
-[unified]: https://github.com/unifiedjs/unified
-
-[retext]: https://github.com/retextjs/retext
-
-[vfile-message]: https://github.com/vfile/vfile-message
-
-[literal]: https://github.com/syntax-tree/nlcst-is-literal#isliteralparent-index
-
-[process]: https://github.com/unifiedjs/unified#processorprocessfilevalue-done
-
 [dictionaries]: https://github.com/wooorm/dictionaries
+
+[nlcst-is-literal]: https://github.com/syntax-tree/nlcst-is-literal
 
 [nspell]: https://github.com/wooorm/nspell
 
-[personal]: https://github.com/wooorm/nspell#personal-dictionary-documents
+[nspell-personal]: https://github.com/wooorm/nspell#personal-dictionary-documents
+
+[retext]: https://github.com/retextjs/retext
+
+[unified]: https://github.com/unifiedjs/unified
+
+[unified-transformer]: https://github.com/unifiedjs/unified#transformer
+
+[vfile-message]: https://github.com/vfile/vfile-message
+
+[api-dictionary]: #dictionary
+
+[api-options]: #options
+
+[api-retext-spell]: #unifieduseretextspell-options
