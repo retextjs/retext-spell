@@ -2,312 +2,244 @@
  * @typedef {import('./index.js').Dictionary} Dictionary
  */
 
-import assert from 'node:assert'
-import {Buffer} from 'node:buffer'
-import test from 'tape'
-import en from 'dictionary-en'
-import enGb from 'dictionary-en-gb'
+import assert from 'node:assert/strict'
+import test from 'node:test'
+import dictionaryEn from 'dictionary-en'
 import {retext} from 'retext'
-import emoji from 'retext-emoji'
+import retextEmoji from 'retext-emoji'
 import retextSpell from './index.js'
 
-test('should throw when without `options`', (t) => {
-  t.throws(
-    () => {
-      // @ts-expect-error: to do.
+test('retextSpell', async function (t) {
+  await t.test('should throw when without `options`', async function () {
+    assert.throws(() => {
+      // @ts-expect-error: check how the runtime handles missing options.
       retext().use(retextSpell).freeze()
-    },
-    /^TypeError: Expected `Object`, got `undefined`$/,
-    'should throw'
-  )
+    }, /^TypeError: Expected `Object`, got `undefined`$/)
+  })
 
-  t.end()
-})
+  await t.test('should fail load errors on the VFile', async function () {
+    const processor = retext().use(retextSpell, failingDictionary)
 
-test('should fail load errors on the VFile', async (t) => {
-  /** @type {Dictionary} */
-  function failingDictionary(callback) {
-    setImmediate(() => {
-      callback(new Error('load error'))
-    })
-  }
+    try {
+      await processor.process('')
+      assert.fail()
+    } catch (error) {
+      assert.match(String(error), /load error/)
+    }
 
-  const processor = retext().use(retextSpell, failingDictionary)
+    // Coverage: future files can fail immediately.
+    try {
+      await processor.process('')
+      assert.fail()
+    } catch (error) {
+      assert.match(String(error), /load error/)
+    }
 
-  try {
-    await processor.process('')
-    t.fail('failing dictionary should not pass')
-  } catch (error) {
-    t.match(String(error), /load error/, 'expected error to throw process (1)')
-  }
-
-  // Coverage: future files can fail immediately.
-  try {
-    await processor.process('')
-    t.fail('failing dictionary should not pass')
-  } catch (error) {
-    t.match(String(error), /load error/, 'expected error to throw process (2)')
-  }
-})
-
-test('should warn for misspelt words', async (t) => {
-  const file = await retext().use(retextSpell, enGb).process('color')
-
-  t.deepEqual(
-    JSON.parse(JSON.stringify({...file.messages[0], ancestors: []})),
-    {
-      ancestors: [],
-      column: 1,
-      fatal: false,
-      message: '`color` is misspelt; did you mean `colon`, `colour`, `Colo`?',
-      line: 1,
-      name: '1:1-1:6',
-      place: {
-        start: {line: 1, column: 1, offset: 0},
-        end: {line: 1, column: 6, offset: 5}
-      },
-      reason: '`color` is misspelt; did you mean `colon`, `colour`, `Colo`?',
-      ruleId: 'color',
-      source: 'retext-spell',
-      actual: 'color',
-      expected: ['colon', 'colour', 'Colo'],
-      url: 'https://github.com/retextjs/retext-spell#readme'
-    },
-    'should emit messages'
-  )
-
-  check(t, await retext().use(retextSpell, enGb).process('color'), [
-    '1:1-1:6: `color` is misspelt'
-  ])
-
-  check(t, await retext().use(retextSpell, en).process('colour and utilise'), [
-    '1:1-1:7: `colour` is misspelt',
-    '1:12-1:19: `utilise` is misspelt'
-  ])
-
-  check(
-    t,
-    await retext().use(retextSpell, en).process('colour and colour and colour'),
-    [
-      '1:1-1:7: `colour` is misspelt',
-      '1:12-1:18: `colour` is misspelt',
-      '1:23-1:29: `colour` is misspelt'
-    ]
-  )
-})
-
-test('should warn for invalid words (coverage)', async (t) => {
-  const english = retext().use(retextSpell, enGb)
-
-  check(t, await english.process('color'), ['1:1-1:6: `color` is misspelt'])
-  check(t, await english.process('colour'), [])
-})
-
-test('should cache suggestions', async (t) => {
-  const processor = retext().use(retextSpell, enGb)
-  const numberOfChecks = 2
-  let index = -1
-
-  t.plan(numberOfChecks)
-
-  while (++index < numberOfChecks) {
-    const file = await processor.process('color')
-
-    t.deepEqual(
-      String(file.messages),
-      '1:1-1:6: `color` is misspelt; did you mean `colon`, `colour`, `Colo`?',
-      'should emit messages'
-    )
-  }
-})
-
-test('should support `max`, for maximum suggestions', async (t) => {
-  check(
-    t,
-    await retext()
-      .use(retextSpell, {dictionary: enGb, max: 1})
-      .process('Some useles mispelt documeant'),
-    [
-      '1:6-1:12: `useles` is misspelt',
-      '1:13-1:20: Too many misspellings',
-      '1:13-1:20: `mispelt` is misspelt',
-      '1:21-1:30: `documeant` is misspelt'
-    ]
-  )
-})
-
-test('should ignore literal words', async (t) => {
-  check(t, await retext().use(retextSpell, enGb).process('“color”'), [])
-})
-
-test('...unless `ignoreLiteral` is false', async (t) => {
-  check(
-    t,
-    await retext()
-      .use(retextSpell, {dictionary: enGb, ignoreLiteral: false})
-      .process('“color”'),
-    ['1:2-1:7: `color` is misspelt']
-  )
-})
-
-test('should warn for misspelt hyphenated words', async (t) => {
-  check(
-    t,
-    await retext().use(retextSpell, enGb).process('wrongely-spelled-word'),
-    ['1:1-1:22: `wrongely-spelled-word` is misspelt']
-  )
-})
-
-test('should not warn for correctly spelled hyphenated words', async (t) => {
-  check(
-    t,
-    await retext().use(retextSpell, enGb).process('random-hyphenated-word'),
-    []
-  )
-})
-
-test('should not warn for ignored words in hyphenated words', async (t) => {
-  check(
-    t,
-    await retext()
-      .use(retextSpell, {
-        dictionary: enGb,
-        ignore: ['wrongely']
+    /** @type {Dictionary} */
+    function failingDictionary(callback) {
+      setImmediate(() => {
+        callback(new Error('load error'))
       })
-      .process('wrongely-spelled-word'),
-    []
-  )
-})
-
-test('should ignore digits', async (t) => {
-  check(t, await retext().use(retextSpell, enGb).process('123456'), [])
-})
-
-test('should ignore times', async (t) => {
-  check(
-    t,
-    await retext().use(retextSpell, enGb).process('Let’s meet at 2:41pm.'),
-    []
-  )
-
-  check(
-    t,
-    await retext().use(retextSpell, enGb).process('On my way! ETA 11:50!'),
-    []
-  )
-})
-
-test('should treat smart apostrophes as straight apostrophes', async (t) => {
-  check(t, await retext().use(retextSpell, enGb).process('It doesn’t work'), [])
-
-  check(
-    t,
-    await retext().use(retextSpell, enGb).process("It doesn't work."),
-    []
-  )
-
-  check(
-    t,
-    await retext()
-      .use(retextSpell, {
-        dictionary: enGb,
-        normalizeApostrophes: false
-      })
-      .process("It doesn't work"),
-    []
-  )
-})
-
-test('...unless `ignoreDigits` is false', async (t) => {
-  check(
-    t,
-    await retext()
-      .use(retextSpell, {dictionary: enGb, ignoreDigits: false})
-      .process('123456'),
-    ['1:1-1:7: `123456` is misspelt']
-  )
-})
-
-test('should ignore digits with decimals', async (t) => {
-  check(t, await retext().use(retextSpell, enGb).process('3.14'), [])
-})
-
-test('...unless `ignoreDigits` is false', async (t) => {
-  check(
-    t,
-    await retext()
-      .use(retextSpell, {dictionary: enGb, ignoreDigits: false})
-      .process('3.15'),
-    ['1:1-1:5: `3.15` is misspelt']
-  )
-})
-
-test('should not ignore words that include digits', async (t) => {
-  check(t, await retext().use(retextSpell, enGb).process('768x1024'), [
-    '1:1-1:9: `768x1024` is misspelt'
-  ])
-})
-
-test('should `ignore`', async (t) => {
-  check(
-    t,
-    await retext()
-      .use(retextSpell, {dictionary: enGb, ignore: ['color']})
-      .process('color coloor'),
-    ['1:7-1:13: `coloor` is misspelt']
-  )
-})
-
-test('should accept `personal`', async (t) => {
-  // Forbid UK spelling, mark US spelling as correct.
-  const personal = '*colour\ncolor\n'
-
-  check(
-    t,
-    await retext()
-      .use(retextSpell, {dictionary: enGb, personal})
-      .process('color coloor colour'),
-    ['1:7-1:13: `coloor` is misspelt', '1:14-1:20: `colour` is misspelt']
-  )
-
-  check(
-    t,
-    await retext()
-      .use(retextSpell, {dictionary: enGb, personal: Buffer.from(personal)})
-      .process('color coloor colour'),
-    ['1:7-1:13: `coloor` is misspelt', '1:14-1:20: `colour` is misspelt']
-  )
-})
-
-test('should integrate w/ `retext-emoji`', async (t) => {
-  check(t, await retext().use(retextSpell, enGb).process('Pages ⚡️'), [
-    '1:8-1:9: `️` is misspelt; did you mean'
-  ])
-
-  check(
-    t,
-    await retext().use(emoji).use(retextSpell, enGb).process('Pages ⚡️'),
-    []
-  )
-})
-
-/**
- * @param {import('tape').Test} t
- * @param {import('vfile').VFile} file
- * @param {Array<string>} expected
- */
-function check(t, file, expected) {
-  t.doesNotThrow(() => {
-    const messages = file.messages
-    const length = Math.max(expected.length, messages.length)
-    let index = -1
-
-    while (++index < length) {
-      assert.strictEqual(
-        String(messages[index]).indexOf(expected[index]),
-        0,
-        expected[index]
-      )
     }
   })
-}
+
+  await t.test('should emit a message w/ metadata', async function () {
+    const file = await retext().use(retextSpell, dictionaryEn).process('kolor')
+
+    assert.deepEqual(
+      JSON.parse(JSON.stringify({...file.messages[0], ancestors: []})),
+      {
+        actual: 'kolor',
+        ancestors: [],
+        column: 1,
+        expected: ['color', 'dolor'],
+        fatal: false,
+        line: 1,
+        message: '`kolor` is misspelt; did you mean `color`, `dolor`?',
+        name: '1:1-1:6',
+        place: {
+          start: {column: 1, line: 1, offset: 0},
+          end: {column: 6, line: 1, offset: 5}
+        },
+        reason: '`kolor` is misspelt; did you mean `color`, `dolor`?',
+        ruleId: 'kolor',
+        source: 'retext-spell',
+        url: 'https://github.com/retextjs/retext-spell#readme'
+      }
+    )
+  })
+
+  await t.test('should work', async function () {
+    const file = await retext().use(retextSpell, dictionaryEn).process('kolor')
+
+    assert.deepEqual(file.messages.map(String), [
+      '1:1-1:6: `kolor` is misspelt; did you mean `color`, `dolor`?'
+    ])
+  })
+
+  await t.test('should work w/ repeated misspellings', async function () {
+    const file = await retext()
+      .use(retextSpell, dictionaryEn)
+      .process('kolor and kolor and kolor')
+
+    assert.deepEqual(file.messages.map(String), [
+      '1:1-1:6: `kolor` is misspelt; did you mean `color`, `dolor`?',
+      '1:11-1:16: `kolor` is misspelt; did you mean `color`, `dolor`?',
+      '1:21-1:26: `kolor` is misspelt; did you mean `color`, `dolor`?'
+    ])
+  })
+
+  await t.test(
+    'should work w/ repeated calls to misspellings',
+    async function () {
+      const processor = retext().use(retextSpell, dictionaryEn)
+      const fileA = await processor.process('kolor')
+      assert.equal(fileA.messages.length, 1)
+
+      const fileB = await processor.process('kolor')
+      assert.equal(fileB.messages.length, 1)
+    }
+  )
+
+  await t.test('should support `options.max`', async function () {
+    const file = await retext()
+      .use(retextSpell, {dictionary: dictionaryEn, max: 1})
+      .process('Soem useles mispelt documeant')
+
+    assert.deepEqual(file.messages.map(String), [
+      '1:1-1:5: `Soem` is misspelt',
+      '1:6-1:12: Too many misspellings; no further spell suggestions are given',
+      '1:6-1:12: `useles` is misspelt',
+      '1:13-1:20: `mispelt` is misspelt',
+      '1:21-1:30: `documeant` is misspelt'
+    ])
+  })
+
+  await t.test('should ignore literal words by default', async function () {
+    const file = await retext()
+      .use(retextSpell, {dictionary: dictionaryEn})
+      .process('“kolor”')
+
+    assert.deepEqual(file.messages.map(String), [])
+  })
+
+  await t.test(
+    'should include literal words w/ `options.ignoreLiteral: false`',
+    async function () {
+      const file = await retext()
+        .use(retextSpell, {dictionary: dictionaryEn, ignoreLiteral: false})
+        .process('“kolor”')
+
+      assert.deepEqual(file.messages.map(String), [
+        '1:2-1:7: `kolor` is misspelt; did you mean `color`, `dolor`?'
+      ])
+    }
+  )
+
+  await t.test(
+    'should warn for misspellings in hyphenated combination words',
+    async function () {
+      const file = await retext()
+        .use(retextSpell, {dictionary: dictionaryEn, ignoreLiteral: false})
+        .process('wrongely-spelled-word')
+
+      assert.deepEqual(file.messages.map(String), [
+        '1:1-1:22: `wrongely-spelled-word` is misspelt'
+      ])
+    }
+  )
+
+  await t.test(
+    'should not warn for correct words in hyphenated combination words',
+    async function () {
+      const file = await retext()
+        .use(retextSpell, {dictionary: dictionaryEn, ignoreLiteral: false})
+        .process('random-hyphenated-word')
+
+      assert.deepEqual(file.messages.map(String), [])
+    }
+  )
+
+  await t.test('should support `options.ignore`', async function () {
+    const file = await retext()
+      .use(retextSpell, {
+        dictionary: dictionaryEn,
+        ignore: ['kolor', 'wrongely']
+      })
+      .process('kolor and wrongely-spelled-word')
+
+    assert.deepEqual(file.messages.map(String), [])
+  })
+
+  await t.test('should ignore digits', async function () {
+    const file = await retext()
+      .use(retextSpell, {dictionary: dictionaryEn})
+      .process('123456 alpha 3.14')
+
+    assert.deepEqual(file.messages.map(String), [])
+  })
+
+  await t.test(
+    'should include literal words w/ `options.ignoreDigits: false`',
+    async function () {
+      const file = await retext()
+        .use(retextSpell, {dictionary: dictionaryEn, ignoreDigits: false})
+        .process('123456 alpha 3.14')
+
+      assert.deepEqual(file.messages.map(String), [
+        '1:1-1:7: `123456` is misspelt; did you mean `12th456`, `12th3456`, `12th56`?',
+        '1:14-1:18: `3.14` is misspelt; did you mean `3.14th`?'
+      ])
+    }
+  )
+
+  await t.test('should include words that contain digits', async function () {
+    const file = await retext()
+      .use(retextSpell, {dictionary: dictionaryEn})
+      .process('768x1024')
+
+    assert.deepEqual(file.messages.map(String), [
+      '1:1-1:9: `768x1024` is misspelt; did you mean `76th8x1024`, `76thx1024`?'
+    ])
+  })
+
+  await t.test('should ignore times', async function () {
+    const file = await retext()
+      .use(retextSpell, {dictionary: dictionaryEn})
+      .process('Let’s meet at 2:41pm. On my way! ETA 11:50!')
+
+    assert.deepEqual(file.messages.map(String), [])
+  })
+
+  await t.test('should support `options.personal`', async function () {
+    const file = await retext()
+      // Forbid US spelling, mark UK spelling as correct.
+      .use(retextSpell, {
+        dictionary: dictionaryEn,
+        personal: '*color\ncolour\n'
+      })
+      .process('color coloor colour')
+
+    assert.deepEqual(file.messages.map(String), [
+      '1:1-1:6: `color` is misspelt; did you mean `dolor`, `colors`, `colon`, `colour`, `Colo`?',
+      '1:7-1:13: `coloor` is misspelt; did you mean `colour`?'
+    ])
+  })
+
+  await t.test('should integrate w/ `retext-emoji` (1)', async function () {
+    const file = await retext()
+      .use(retextSpell, {dictionary: dictionaryEn})
+      .process('Pages ⚡️')
+
+    assert.match(String(file.messages), /`️` is misspelt/)
+  })
+
+  await t.test('should integrate w/ `retext-emoji` (2)', async function () {
+    const file = await retext()
+      .use(retextEmoji)
+      .use(retextSpell, {dictionary: dictionaryEn})
+      .process('Pages ⚡️')
+
+    assert.deepEqual(file.messages.map(String), [])
+  })
+})
