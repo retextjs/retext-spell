@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import dictionaryEn from 'dictionary-en'
+import dictionaryEnV4 from 'dictionary-en-v4'
 import {retext} from 'retext'
 import retextEmoji from 'retext-emoji'
 import retextSpell from 'retext-spell'
@@ -72,6 +73,16 @@ test('retextSpell', async function (t) {
 
   await t.test('should work', async function () {
     const file = await retext().use(retextSpell, dictionaryEn).process('kolor')
+
+    assert.deepEqual(file.messages.map(String), [
+      '1:1-1:6: Unexpected unknown word `kolor`, expected for example `color`, `dolor`'
+    ])
+  })
+
+  await t.test('should work with newer dictionary versions', async function () {
+    const file = await retext()
+      .use(retextSpell, dictionaryEnV4)
+      .process('kolor')
 
     assert.deepEqual(file.messages.map(String), [
       '1:1-1:6: Unexpected unknown word `kolor`, expected for example `color`, `dolor`'
