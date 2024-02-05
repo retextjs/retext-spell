@@ -1,7 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import dictionaryEn from 'dictionary-en'
-import dictionaryEnV4 from 'dictionary-en-v4'
 import {retext} from 'retext'
 import retextEmoji from 'retext-emoji'
 import retextSpell from 'retext-spell'
@@ -79,9 +78,13 @@ test('retextSpell', async function (t) {
     ])
   })
 
-  await t.test('should work with newer dictionary versions', async function () {
+  await t.test('should work with dictionary callbacks', async function () {
     const file = await retext()
-      .use(retextSpell, dictionaryEnV4)
+      .use(retextSpell, function (onload) {
+        setTimeout(function () {
+          onload(undefined, dictionaryEn)
+        }, 10)
+      })
       .process('kolor')
 
     assert.deepEqual(file.messages.map(String), [
